@@ -75,9 +75,9 @@ func _setup_paradigm_list() -> void:
 		{"name": "✋ MI 运动想象", "type": GlobalConfig.ParadigmType.MI},
 	]
 
-	var start_y := 280
-	var card_height := 50
-	var card_width := 400
+	var start_y := 260
+	var card_height := 56
+	var card_width := 520
 	var gap := 12
 
 	for i in range(paradigms.size()):
@@ -135,10 +135,13 @@ func _setup_status() -> void:
 
 	# 圆形指示灯
 	_bci_indicator = Panel.new()
-	_bci_indicator.size = Vector2(14, 14)
+	_bci_indicator.custom_minimum_size = Vector2(14, 14)
 	var circle_style := StyleBoxFlat.new()
 	circle_style.bg_color = Color.RED
-	circle_style.set_corner_radius_all(7)
+	circle_style.corner_radius_top_left = 7
+	circle_style.corner_radius_top_right = 7
+	circle_style.corner_radius_bottom_left = 7
+	circle_style.corner_radius_bottom_right = 7
 	_bci_indicator.add_theme_stylebox_override("panel", circle_style)
 	container.add_child(_bci_indicator)
 
