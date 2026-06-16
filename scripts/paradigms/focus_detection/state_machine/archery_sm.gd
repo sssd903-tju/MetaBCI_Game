@@ -18,7 +18,7 @@ var _state_timer := 0.0
 
 # 各阶段时长
 const READY_TIME := 2.0
-const AIMING_TIME := 5.0
+const AIMING_TIME := 6.0
 const FIRED_TIME := 1.0
 const SCORING_TIME := 2.0
 
