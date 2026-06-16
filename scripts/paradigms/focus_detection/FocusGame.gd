@@ -99,7 +99,8 @@ func _setup_hud() -> void:
 	add_child(_hud)
 
 	# 专注度指示条
-	var focus_bar := FocusBar.new()
+	var FocusBarScript := preload("res://scripts/ui/components/FocusBar.gd")
+	var focus_bar: Node = FocusBarScript.new()
 	focus_bar.name = "FocusBar"
 	_hud.add_child(focus_bar)
 
