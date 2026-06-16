@@ -3,10 +3,10 @@ class_name ArcheryCrosshair
 ## Crosshair — 准星实体，专注度驱动移动
 
 # 基础移动速度 (像素/秒)
-@export var base_speed := 45.0
+@export var base_speed := 50.0
 
 # 抖动强度
-@export var jitter_strength := 5.0
+@export var jitter_strength := 7.0
 
 # 当前专注度
 var focus_ratio := 1.5
@@ -53,7 +53,7 @@ func set_target(target_center: Vector2) -> void:
 func reset_position() -> void:
 	# 从靶面边缘随机位置开始
 	var angle := randf() * TAU
-	var dist := randf_range(15.0, 40.0)
+	var dist := randf_range(95.0, 115.0)
 	position = _target_center + Vector2.RIGHT.rotated(angle) * dist
 	_velocity = Vector2.ZERO
 
@@ -72,20 +72,20 @@ func _process(delta: float) -> void:
 	if focus_ratio >= GlobalConfig.FOCUS_HIGH_THRESHOLD:
 		# 高专注：向靶心快速靠拢，微抖
 		direction = to_center.normalized()
-		speed = base_speed * (1.2 + (focus_ratio - 2.5) * 1.0)
-		_update_jitter(delta, 0.1)  # 低抖动
+		speed = base_speed * (1.6 + (focus_ratio - 2.5) * 1.4)
+		_update_jitter(delta, 0.05)  # 极低抖动
 
 	elif focus_ratio >= GlobalConfig.FOCUS_MEDIUM_THRESHOLD:
 		# 中专注：慢速靠拢，高抖动
 		direction = to_center.normalized()
-		speed = base_speed * 0.35
-		_update_jitter(delta, 0.7)
+		speed = base_speed * 0.22
+		_update_jitter(delta, 1.2)
 
 	else:
 		# 低专注：向外漂移 + 强烈抖动
 		direction = -to_center.normalized()
-		speed = base_speed * (1.5 - focus_ratio) * 0.5
-		_update_jitter(delta, 0.6)
+		speed = base_speed * (1.5 - focus_ratio) * 0.8
+		_update_jitter(delta, 1.5)
 
 	# 更新位置
 	_velocity = direction * speed
