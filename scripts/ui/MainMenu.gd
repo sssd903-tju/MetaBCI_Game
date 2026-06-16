@@ -135,7 +135,7 @@ func _setup_status() -> void:
 	container.anchor_right = 1.0
 	container.anchor_bottom = 1.0
 	container.anchor_top = 1.0
-	container.offset_top = -56
+	container.offset_top = -76
 	container.offset_bottom = 0
 	container.offset_left = 0
 	container.offset_right = 0
