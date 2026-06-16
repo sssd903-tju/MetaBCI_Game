@@ -53,7 +53,7 @@ func set_target(target_center: Vector2) -> void:
 func reset_position() -> void:
 	# 从靶面边缘随机位置开始
 	var angle := randf() * TAU
-	var dist := randf_range(80.0, 150.0)
+	var dist := randf_range(15.0, 40.0)
 	position = _target_center + Vector2.RIGHT.rotated(angle) * dist
 	_velocity = Vector2.ZERO
 
@@ -70,16 +70,16 @@ func _process(delta: float) -> void:
 	var speed: float
 
 	if focus_ratio >= GlobalConfig.FOCUS_HIGH_THRESHOLD:
-		# 高专注：向靶心快速靠拢
+		# 高专注：向靶心快速靠拢，微抖
 		direction = to_center.normalized()
-		speed = base_speed * (1.0 + (focus_ratio - 2.5) * 0.8)
-		_jitter_offset = Vector2.ZERO  # 无抖动
+		speed = base_speed * (1.2 + (focus_ratio - 2.5) * 1.0)
+		_update_jitter(delta, 0.1)  # 低抖动
 
 	elif focus_ratio >= GlobalConfig.FOCUS_MEDIUM_THRESHOLD:
-		# 中专注：缓慢靠近，轻微抖动
+		# 中专注：慢速靠拢，高抖动
 		direction = to_center.normalized()
-		speed = base_speed * 0.55
-		_update_jitter(delta, 0.2)
+		speed = base_speed * 0.35
+		_update_jitter(delta, 0.7)
 
 	else:
 		# 低专注：向外漂移 + 强烈抖动
