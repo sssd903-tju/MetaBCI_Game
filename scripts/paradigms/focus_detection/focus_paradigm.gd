@@ -91,8 +91,8 @@ func _on_state_changed(_old: ArcheryStateMachine.State, new: ArcheryStateMachine
 
 func _on_ready() -> void:
 	_crosshair.active = false
-	_crosshair.reset_position()
 	_crosshair.set_target(_target.get_center())
+	_crosshair.reset_position()
 	_hud.update_state("准备...")
 	_hud.update_round(_sm.current_round + 1)
 	_hud.show_timer(false)
