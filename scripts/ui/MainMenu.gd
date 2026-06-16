@@ -82,7 +82,7 @@ func _setup_paradigm_list() -> void:
 	var gap := 16
 
 	for i in range(paradigms.size()):
-		var p := paradigms[i]
+		var p: Dictionary = paradigms[i]
 
 		# 卡片容器
 		var card := Panel.new()
