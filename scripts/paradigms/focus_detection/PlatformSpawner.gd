@@ -15,14 +15,6 @@ class_name PlatformSpawner
 var _platforms: Array[FocusPlatform] = []
 var _last_spawn_x := 0.0
 var _player_ref: FocusPlayer = null
-var _platform_scene: PackedScene = null
-
-# 平台样式缓存
-var _platform_scenes := {
-	FocusPlatform.PlatformType.NORMAL: null,
-	FocusPlatform.PlatformType.FRAGILE: null,
-	FocusPlatform.PlatformType.MOVING: null,
-}
 
 
 func _ready() -> void:

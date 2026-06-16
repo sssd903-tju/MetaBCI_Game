@@ -96,7 +96,7 @@ func _on_paradigm_end() -> void:
 	push_warning("[%s] _on_paradigm_end() 未被覆写" % _get_paradigm_name())
 
 
-func _on_bci_data(data: Dictionary) -> void:
+func _on_bci_data(_data: Dictionary) -> void:
 	"""处理 BCI 数据
 	Args:
 	    data: {"ratio": float, "theta": float, "alpha": float, "beta": float}

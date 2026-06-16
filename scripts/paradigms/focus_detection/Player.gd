@@ -17,8 +17,6 @@ var focus_ratio := 1.5
 var is_on_platform := false
 var _sprite: ColorRect
 var _glow: ColorRect
-var _trail: Array[ColorRect] = []
-var _trail_timer := 0.0
 var _auto_move := true
 
 
@@ -69,7 +67,7 @@ func _physics_process(delta: float) -> void:
 
 func _update_visuals(delta: float) -> void:
 	# 光晕颜色随专注度变化
-	var target_glow := GlobalConfig.focus_to_color(focus_ratio)
+	var target_glow := focus_to_color(focus_ratio)
 	target_glow.a = clampf(focus_ratio / 3.0, 0.0, 0.6)
 	_glow.color = _glow.color.lerp(target_glow, 5.0 * delta)
 
@@ -77,12 +75,8 @@ func _update_visuals(delta: float) -> void:
 	var breath := 1.0 + sin(Time.get_ticks_msec() / 1000.0 * 3.0) * 0.05
 	_glow.scale = Vector2(breath, breath)
 
-	# 移动拖尾
-	_trail_timer += delta
-	if _trail_timer > 0.05 and abs(velocity.x) > 10:
-		_trail_timer = 0.0
-		# 拖尾简化：调整光晕透明度模拟
-		pass
+	# 移动视觉反馈
+	modulate.a = 1.0 - abs(velocity.y) / 800.0 * 0.3
 
 
 func jump() -> void:

@@ -151,7 +151,7 @@ func _setup_bci_indicator() -> void:
 	add_child(_bci_indicator)
 
 
-func _on_paradigm_selected(index: int, paradigm_type: GlobalConfig.ParadigmType) -> void:
+func _on_paradigm_selected(_index: int, paradigm_type: GlobalConfig.ParadigmType) -> void:
 	print("[MainMenu] 选择范式: ", GlobalConfig.PARADIGM_NAMES[paradigm_type])
 	ParadigmManager.switch_to(paradigm_type)
 
@@ -200,18 +200,18 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_up"):
 		_selected_index = (_selected_index - 1 + _paradigm_buttons.size()) % _paradigm_buttons.size()
 		_update_selection()
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 	elif event.is_action_pressed("ui_down"):
 		_selected_index = (_selected_index + 1) % _paradigm_buttons.size()
 		_update_selection()
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 	elif event.is_action_pressed("ui_accept"):
 		if _paradigm_buttons.size() > 0:
 			_paradigm_buttons[_selected_index].emit_signal("pressed")
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 	elif event.is_action_pressed("ui_cancel"):
 		get_tree().quit()
-		get_viewport().set_input_as_handled()
+		accept_event()

@@ -84,7 +84,7 @@ func _on_focus_data(ratio: float, _theta: float, _alpha: float, _beta: float) ->
 
 
 func _on_quality_changed(value: float) -> void:
-	_quality_rect.color = GlobalConfig.focus_to_color(value * 2.0)  # 映射质量值到颜色
+	_quality_rect.color = focus_to_color(value * 2.0)  # 映射质量值到颜色
 
 
 func _process(delta: float) -> void:
@@ -97,7 +97,7 @@ func _process(delta: float) -> void:
 	_bar_rect.size.x = lerpf(_bar_rect.size.x, max_width * fill_ratio, animation_speed * delta)
 
 	# 颜色渐变
-	_bar_rect.color = GlobalConfig.focus_to_color(_display_ratio)
+	_bar_rect.color = focus_to_color(_display_ratio)
 
 	# 文字
 	var level := "低"

@@ -98,17 +98,17 @@ const PARADIGM_SCENES := {
 # 工具函数
 # ============================================================
 
-static func hex_to_color(hex_string: String) -> Color:
+func hex_to_color(hex_string: String) -> Color:
 	"""将 HEX 颜色字符串转为 Godot Color"""
 	return Color(hex_string)
 
 
-static func lerp_color(a: Color, b: Color, t: float) -> Color:
+func lerp_color(a: Color, b: Color, t: float) -> Color:
 	"""在两个颜色之间线性插值"""
 	return a.lerp(b, clampf(t, 0.0, 1.0))
 
 
-static func focus_to_color(ratio: float) -> Color:
+func focus_to_color(ratio: float) -> Color:
 	"""将专注度比值映射到颜色（绿→黄→红）"""
 	if ratio >= FOCUS_HIGH_THRESHOLD:
 		return UI_SUCCESS

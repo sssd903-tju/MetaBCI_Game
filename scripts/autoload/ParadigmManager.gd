@@ -8,7 +8,6 @@ signal paradigm_started(paradigm: GlobalConfig.ParadigmType)
 signal paradigm_ended(paradigm: GlobalConfig.ParadigmType)
 
 var current_paradigm := GlobalConfig.ParadigmType.FOCUS_DETECTION
-var _paradigm_scene: Node = null
 
 
 func _ready() -> void:
