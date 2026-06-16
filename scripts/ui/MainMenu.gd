@@ -135,15 +135,16 @@ func _setup_status() -> void:
 	container.anchor_right = 1.0
 	container.anchor_bottom = 1.0
 	container.anchor_top = 1.0
-	container.offset_top = -36
+	container.offset_top = -56
 	container.offset_bottom = 0
 	container.offset_left = 0
 	container.offset_right = 0
 	add_child(container)
 
-	# 圆形指示灯
+	# 圆形指示灯（禁止容器拉伸变形）
 	_bci_indicator = Panel.new()
 	_bci_indicator.custom_minimum_size = Vector2(14, 14)
+	_bci_indicator.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var circle_style := StyleBoxFlat.new()
 	circle_style.bg_color = Color.RED
 	circle_style.corner_radius_top_left = 7
