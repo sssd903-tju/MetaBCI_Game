@@ -7,7 +7,7 @@ var _paradigm_buttons: Array[Button] = []
 var _selected_index := 0
 var _title_label: Label
 var _status_label: Label
-var _bci_indicator: ColorRect
+var _bci_indicator: Panel
 
 
 func _ready() -> void:
@@ -15,7 +15,6 @@ func _ready() -> void:
 	_setup_title()
 	_setup_paradigm_list()
 	_setup_status()
-	_setup_bci_indicator()
 
 	# 监听 BCI 连接状态
 	BCIConnector.bci_connected.connect(_on_bci_connected)
@@ -133,22 +132,30 @@ func _setup_paradigm_list() -> void:
 
 
 func _setup_status() -> void:
+	# 状态栏容器（圆形指示灯 + 文字）
+	var container := HBoxContainer.new()
+	container.name = "StatusContainer"
+	container.alignment = BoxContainer.ALIGNMENT_CENTER
+	container.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	container.position = Vector2(0, -50)
+	container.add_theme_constant_override("separation", 8)
+	add_child(container)
+
+	# 圆形指示灯
+	_bci_indicator = Panel.new()
+	_bci_indicator.size = Vector2(14, 14)
+	var circle_style := StyleBoxFlat.new()
+	circle_style.bg_color = Color.RED
+	circle_style.set_corner_radius_all(7)
+	_bci_indicator.add_theme_stylebox_override("panel", circle_style)
+	container.add_child(_bci_indicator)
+
+	# 状态文字
 	_status_label = Label.new()
 	_status_label.text = "BCI 状态: 检测中..."
-	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status_label.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_SECONDARY)
 	_status_label.add_theme_font_size_override("font_size", 13)
-	_status_label.position = Vector2(0, GlobalConfig.GAME_HEIGHT - 50)
-	_status_label.size = Vector2(GlobalConfig.GAME_WIDTH, 30)
-	add_child(_status_label)
-
-
-func _setup_bci_indicator() -> void:
-	_bci_indicator = ColorRect.new()
-	_bci_indicator.size = Vector2(12, 12)
-	_bci_indicator.position = Vector2(GlobalConfig.GAME_WIDTH / 2.0 + 80, GlobalConfig.GAME_HEIGHT - 44)
-	_bci_indicator.color = Color.RED
-	add_child(_bci_indicator)
+	container.add_child(_status_label)
 
 
 func _on_paradigm_selected(_index: int, paradigm_type: GlobalConfig.ParadigmType) -> void:
@@ -165,14 +172,15 @@ func _on_bci_disconnected() -> void:
 
 
 func _update_bci_status() -> void:
+	var style := _bci_indicator.get_theme_stylebox("panel") as StyleBoxFlat
 	if BCIConnector._connected:
-		_status_label.text = "BCI 状态: ● 已连接 — 脑电数据就绪"
+		_status_label.text = "BCI 已连接 — 脑电数据就绪"
 		_status_label.add_theme_color_override("font_color", GlobalConfig.UI_SUCCESS)
-		_bci_indicator.color = GlobalConfig.UI_SUCCESS
+		style.bg_color = GlobalConfig.UI_SUCCESS
 	else:
-		_status_label.text = "BCI 状态: ○ 未连接 — 等待脑电数据..."
+		_status_label.text = "BCI 未连接 — 等待脑电数据..."
 		_status_label.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_SECONDARY)
-		_bci_indicator.color = Color.RED
+		style.bg_color = Color.RED
 
 
 func _update_selection() -> void:
