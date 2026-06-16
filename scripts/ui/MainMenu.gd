@@ -75,10 +75,10 @@ func _setup_paradigm_list() -> void:
 		{"name": "✋ MI 运动想象", "type": GlobalConfig.ParadigmType.MI},
 	]
 
-	var start_y := 260
-	var card_height := 56
-	var card_width := 520
-	var gap := 12
+	var start_y := 300
+	var card_height := 64
+	var card_width := 560
+	var gap := 14
 
 	for i in range(paradigms.size()):
 		var p: Dictionary = paradigms[i]
@@ -124,13 +124,21 @@ func _setup_paradigm_list() -> void:
 
 
 func _setup_status() -> void:
-	# 状态栏容器（圆形指示灯 + 文字）
+	# 状态栏容器（圆形指示灯 + 文字），底部居中
 	var container := HBoxContainer.new()
 	container.name = "StatusContainer"
 	container.alignment = BoxContainer.ALIGNMENT_CENTER
-	container.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	container.position = Vector2(0, -50)
+	container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	container.add_theme_constant_override("separation", 8)
+	# 锚定底部居中
+	container.anchor_left = 0.0
+	container.anchor_right = 1.0
+	container.anchor_bottom = 1.0
+	container.anchor_top = 1.0
+	container.offset_top = -36
+	container.offset_bottom = 0
+	container.offset_left = 0
+	container.offset_right = 0
 	add_child(container)
 
 	# 圆形指示灯
