@@ -185,7 +185,7 @@ func _update_selection() -> void:
 			style.border_width_right = 3
 			style.border_width_top = 3
 			style.border_width_bottom = 3
-			style.bg_color = GlobalConfig.PLATFORM_NORMAL.darkened(0.85)
+			style.bg_color = GlobalConfig.PLATFORM_NORMAL.lightened(0.75)
 		else:
 			style.border_color = GlobalConfig.PANEL_BORDER
 			style.border_width_left = 2
