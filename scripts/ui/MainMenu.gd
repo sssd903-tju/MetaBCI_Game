@@ -69,16 +69,16 @@ func _setup_title() -> void:
 
 func _setup_paradigm_list() -> void:
 	var paradigms := [
-		{"name": "🎯 专注度检测", "desc": "实时检测注意力水平，控制角色跨越平台", "type": GlobalConfig.ParadigmType.FOCUS_DETECTION},
-		{"name": "👁 SSVEP 稳态视觉诱发电位", "desc": "通过注视闪烁目标实现脑控选择", "type": GlobalConfig.ParadigmType.SSVEP},
-		{"name": "🧠 P300 事件相关电位", "desc": "基于 Oddball 范式的脑机接口拼写器", "type": GlobalConfig.ParadigmType.P300},
-		{"name": "✋ MI 运动想象", "desc": "想象左右手运动驱动游戏角色", "type": GlobalConfig.ParadigmType.MI},
+		{"name": "🎯 专注度检测", "type": GlobalConfig.ParadigmType.FOCUS_DETECTION},
+		{"name": "👁 SSVEP 稳态视觉诱发电位", "type": GlobalConfig.ParadigmType.SSVEP},
+		{"name": "🧠 P300 事件相关电位", "type": GlobalConfig.ParadigmType.P300},
+		{"name": "✋ MI 运动想象", "type": GlobalConfig.ParadigmType.MI},
 	]
 
-	var start_y := 250
-	var card_height := 80
-	var card_width := 500
-	var gap := 16
+	var start_y := 280
+	var card_height := 50
+	var card_width := 400
+	var gap := 12
 
 	for i in range(paradigms.size()):
 		var p: Dictionary = paradigms[i]
@@ -96,30 +96,22 @@ func _setup_paradigm_list() -> void:
 		card_style.border_width_top = 2
 		card_style.border_width_bottom = 2
 		card_style.border_color = GlobalConfig.PANEL_BORDER
-		card_style.corner_radius_top_left = 12
-		card_style.corner_radius_top_right = 12
-		card_style.corner_radius_bottom_right = 12
-		card_style.corner_radius_bottom_left = 12
+		card_style.corner_radius_top_left = 10
+		card_style.corner_radius_top_right = 10
+		card_style.corner_radius_bottom_right = 10
+		card_style.corner_radius_bottom_left = 10
 		card.add_theme_stylebox_override("panel", card_style)
 		add_child(card)
 
-		# 范式名称
+		# 范式名称（垂直居中）
 		var name_label := Label.new()
 		name_label.text = p["name"]
-		name_label.position = Vector2(20, 14)
-		name_label.size = Vector2(card_width - 40, 28)
+		name_label.position = Vector2(20, 0)
+		name_label.size = Vector2(card_width - 40, card_height)
+		name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		name_label.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_PRIMARY)
 		name_label.add_theme_font_size_override("font_size", 18)
 		card.add_child(name_label)
-
-		# 范式描述
-		var desc_label := Label.new()
-		desc_label.text = p["desc"]
-		desc_label.position = Vector2(20, 42)
-		desc_label.size = Vector2(card_width - 40, 24)
-		desc_label.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_SECONDARY)
-		desc_label.add_theme_font_size_override("font_size", 13)
-		card.add_child(desc_label)
 
 		# 保存按钮引用（透明按钮覆盖卡片）
 		var btn := Button.new()
