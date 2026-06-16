@@ -1,0 +1,18 @@
+# MetaBCI BCI Game Paradigm Platform — Python Bridge
+# ===================================================
+
+# Core EEG processing
+numpy>=1.24
+scipy>=1.10
+
+# LSL (Lab Streaming Layer) for EEG data streaming
+pylsl>=1.16
+
+# WebSocket server for Godot communication
+websockets>=12.0
+
+# Real-time filtering
+mne>=1.5
+
+# Async support
+asyncio
