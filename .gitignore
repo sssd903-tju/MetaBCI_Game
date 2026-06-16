@@ -37,5 +37,8 @@ logLastFrameIntervals.log
 # Claude
 .claude/
 
+# Godot UID cache
+*.uid
+
 # Backup
 *.bak
