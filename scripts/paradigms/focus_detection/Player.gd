@@ -67,7 +67,7 @@ func _physics_process(delta: float) -> void:
 
 func _update_visuals(delta: float) -> void:
 	# 光晕颜色随专注度变化
-	var target_glow := focus_to_color(focus_ratio)
+	var target_glow: Color = GlobalConfig.focus_to_color(focus_ratio)
 	target_glow.a = clampf(focus_ratio / 3.0, 0.0, 0.6)
 	_glow.color = _glow.color.lerp(target_glow, 5.0 * delta)
 
