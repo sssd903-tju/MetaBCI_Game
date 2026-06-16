@@ -88,7 +88,7 @@ const PARADIGM_NAMES := {
 }
 
 const PARADIGM_SCENES := {
-	ParadigmType.FOCUS_DETECTION: "res://scenes/focus_detection/FocusGame.tscn",
+	ParadigmType.FOCUS_DETECTION: "res://scenes/focus_detection/archery_game.tscn",
 	ParadigmType.SSVEP: "res://scenes/ssvep/SSVEPGame.tscn",
 	ParadigmType.P300: "res://scenes/p300/P300Game.tscn",
 	ParadigmType.MI: "res://scenes/mi/MIGame.tscn",
