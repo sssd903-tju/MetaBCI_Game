@@ -33,6 +33,9 @@ func _process(delta: float) -> void:
 	position.x += _velocity.x * delta
 	position.y = _base_y + sin(_age * _wave_freq + _wave_offset) * _wave_amp
 
+	# 缩放呼吸效果 (0.7 ~ 1.3)
+	scale = Vector2.ONE * (1.0 + sin(_age * 5.0 + _wave_offset) * 0.3)
+
 	# 渐入渐出
 	var alpha: float = 1.0
 	if _age < 0.3:

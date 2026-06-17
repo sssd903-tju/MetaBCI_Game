@@ -70,8 +70,9 @@ func _spawn_one() -> void:
 
 	d.position = start_pos
 
-	# 穿过屏幕的随机速度
-	var target := Vector2(randf_range(200, GlobalConfig.GAME_WIDTH - 200), randf_range(200, GlobalConfig.GAME_HEIGHT - 200))
+	# 穿过靶心附近的随机轨迹
+	var tc := Vector2(GlobalConfig.GAME_WIDTH / 2.0, GlobalConfig.GAME_HEIGHT / 2.0 + 60)
+	var target := tc + Vector2(randf_range(-250, 250), randf_range(-200, 200))
 	var dir := (target - start_pos).normalized()
 	var speed := randf_range(40.0, 100.0)
 	var velocity := dir * speed
