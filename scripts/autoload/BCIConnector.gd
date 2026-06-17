@@ -12,6 +12,7 @@ extends Node
 ##     {"type": "game_state", "score": 42, "player_y": 300}
 
 signal focus_data_received(ratio: float, theta: float, alpha: float, beta: float)
+signal ssvep_result_received(frequency: float, target_index: int)
 signal eeg_quality_changed(value: float)
 signal bci_connected()
 signal bci_disconnected()
@@ -108,6 +109,12 @@ func _handle_packet(raw: String) -> void:
 				latest_theta,
 				latest_alpha,
 				latest_beta
+			)
+
+		"ssvep_result":
+			ssvep_result_received.emit(
+				data.get("frequency", 0.0),
+				data.get("target_index", -1)
 			)
 
 		"eeg_quality":

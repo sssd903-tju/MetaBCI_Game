@@ -27,10 +27,12 @@ func _on_paradigm_end() -> void:
 
 
 func _on_bci_data(_data: Dictionary) -> void:
-	# SSVEP 解码结果: data["frequency"] 或 data["target_index"]
-	var freq: float = _data.get("frequency", 0.0)
-	if freq > 0.0:
-		_selected_hole = _grid.match_frequency(freq)
+	pass  # SSVEP 使用独立信号
+
+
+func _on_ssvep_result(frequency: float, target_index: int) -> void:
+	if target_index >= 0:
+		_selected_hole = target_index
 
 
 # --- 场景构建 ---

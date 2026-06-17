@@ -52,7 +52,7 @@ func _setup_label() -> void:
 
 func _process(delta: float) -> void:
 	var t: float = Time.get_ticks_msec() / 1000.0
-	_flicker_brightness = (sin(t * frequency * TAU) + 1.0) / 2.0
+	_flicker_brightness = 1.0 if sin(t * frequency * TAU) >= 0 else 0.0
 
 	# 垂直滑动动画
 	if mole_visible and _mole_progress < 1.0:
