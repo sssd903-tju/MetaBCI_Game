@@ -25,7 +25,7 @@ func _setup_hammer() -> void:
 	var tex: Texture2D = load("res://assets/textures/hammer.png")
 	if tex:
 		_hammer_sprite.texture = tex
-		_hammer_sprite.scale = Vector2(0.3, 0.3)
+		_hammer_sprite.scale = Vector2(0.08, 0.08)
 		print("[MoleGrid] 锤子贴图加载成功: ", tex.get_size())
 	else:
 		print("[MoleGrid] 锤子贴图加载失败!")
