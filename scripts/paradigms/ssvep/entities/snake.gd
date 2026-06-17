@@ -93,7 +93,7 @@ func _tick() -> void:
 func grow(n: int = 1) -> void:
 	_grow_pending += n
 	# 加速
-	_tick_interval = maxf(0.12, _tick_interval - 0.008)
+	_tick_interval = maxf(0.08, _tick_interval - 0.015)
 
 
 func get_head() -> Vector2i:
