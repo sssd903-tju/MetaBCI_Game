@@ -3,7 +3,7 @@ class_name ArcheryTarget
 ## Target — 靶子实体，1-10 环同心圆
 
 # 总半径 (像素)
-@export var total_radius := 180.0
+@export var total_radius := 240.0
 
 # 10 个环，每环宽度 = total_radius / 10
 var ring_width: float:

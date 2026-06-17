@@ -41,7 +41,7 @@ func _setup() -> void:
 	_timer_bg = ColorRect.new()
 	_timer_bg.color = GlobalConfig.PANEL_BORDER
 	_timer_bg.size = Vector2(300, 8)
-	_timer_bg.position = Vector2((GlobalConfig.GAME_WIDTH - 300) / 2.0, 150)
+	_timer_bg.position = Vector2((GlobalConfig.GAME_WIDTH - 300) / 2.0, GlobalConfig.GAME_HEIGHT / 2.0 - 195)
 	add_child(_timer_bg)
 
 	_timer_bar = ColorRect.new()
@@ -71,7 +71,7 @@ func _setup() -> void:
 	# 结果弹窗 — 先隐藏
 	_result_label = _make_label("", 22, GlobalConfig.UI_ACCENT)
 	_result_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_result_label.position = Vector2(0, GlobalConfig.GAME_HEIGHT / 2.0 + 50)
+	_result_label.position = Vector2(0, GlobalConfig.GAME_HEIGHT / 2.0 - 230)
 	_result_label.size = Vector2(GlobalConfig.GAME_WIDTH, 30)
 	add_child(_result_label)
 

@@ -52,7 +52,7 @@ func _setup_game() -> void:
 	# 靶子 — 屏幕中央
 	_target = ArcheryTarget.new()
 	_target.name = "Target"
-	_target.position = Vector2(GlobalConfig.GAME_WIDTH / 2.0, GlobalConfig.GAME_HEIGHT / 2.0 - 20)
+	_target.position = Vector2(GlobalConfig.GAME_WIDTH / 2.0, GlobalConfig.GAME_HEIGHT / 2.0 + 60)
 	add_child(_target)
 
 	# 准星
