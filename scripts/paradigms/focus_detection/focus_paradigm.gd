@@ -9,6 +9,7 @@ var _mode: ArcheryMode
 var _target: ArcheryTarget
 var _crosshair: ArcheryCrosshair
 var _hud: ArcheryHUD
+var _distractor_spawner: DistractorSpawner
 
 # 当前专注度
 var _current_focus := 1.5
@@ -75,6 +76,11 @@ func _setup_game() -> void:
 	_hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_hud)
 
+	# 干扰物生成器
+	_distractor_spawner = DistractorSpawner.new()
+	_distractor_spawner.name = "DistractorSpawner"
+	add_child(_distractor_spawner)
+
 	# 连接状态机信号
 	_sm.state_changed.connect(_on_state_changed)
 	_sm.ready_started.connect(_on_ready)
@@ -94,6 +100,8 @@ func _on_ready() -> void:
 	_crosshair.active = false
 	_crosshair.set_target(_target.get_center())
 	_crosshair.reset_position()
+	_distractor_spawner.active = false
+	_distractor_spawner.clear_all()
 	_hud.update_state("准备...")
 	_hud.update_round(_sm.current_round + 1)
 	_hud.show_timer(false)
@@ -102,6 +110,7 @@ func _on_ready() -> void:
 
 func _on_aiming_start() -> void:
 	_crosshair.active = true
+	_distractor_spawner.active = true
 	_hud.update_state("瞄准中 — 保持专注！")
 	_hud.show_timer(true)
 	_peek_focus = _current_focus
@@ -110,6 +119,7 @@ func _on_aiming_start() -> void:
 
 func _on_fired() -> void:
 	_crosshair.active = false
+	_distractor_spawner.active = false
 	_hud.show_timer(false)
 	AudioManager.stop_charge()
 
@@ -150,6 +160,7 @@ func _process(delta: float) -> void:
 		var progress := _sm.get_aiming_progress()
 		_hud.update_timer(progress)
 		AudioManager.update_charge(progress)
+		_distractor_spawner.update_spawning(delta, _current_focus, _sm.current_round + 1)
 
 		# 检查瞄准是否到期，触发射箭
 		if _sm._state_timer <= 0.0 and _crosshair.active:
