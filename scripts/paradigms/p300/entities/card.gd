@@ -3,7 +3,7 @@ class_name MindCard
 
 var symbol: String = "A♠"
 var card_index: int = 0
-var face_down: bool = true
+var face_down: bool = false
 var flash_on: bool = false
 
 var _glow: float = 0.0
