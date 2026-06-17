@@ -45,7 +45,8 @@ func _setup_background() -> void:
 	var bg := ColorRect.new()
 	bg.name = "Background"
 	bg.color = GlobalConfig.BG_WARM_CREAM
-	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bg.size = Vector2(GlobalConfig.GAME_WIDTH, GlobalConfig.GAME_HEIGHT)
+	bg.position = Vector2.ZERO
 	add_child(bg)
 	move_child(bg, 0)
 
