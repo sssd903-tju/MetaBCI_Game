@@ -119,9 +119,9 @@ func _process(delta: float) -> void:
 				_enter_game_over()
 				return
 
-			# SSVEP 解码 (每 0.5s 检查一次方向)
+			# SSVEP 解码 (每 1s 检查一次方向)
 			_decode_timer += delta
-			if _decode_timer >= 0.5:
+			if _decode_timer >= 1.0:
 				_decode_timer = 0.0
 				if _decoded_dir != "":
 					_snake.set_direction(_decoded_dir)

@@ -20,7 +20,7 @@ var _state_timer: float = 0.0
 
 const READY_TIME := 2.0
 const SHOW_TIME := 0.5      # 地鼠冒出动画
-const DECODE_TIME := 2.5     # SSVEP 解码窗口
+const DECODE_TIME := 1.0     # SSVEP 解码窗口
 const SCORE_TIME := 1.5      # 结果显示
 
 
