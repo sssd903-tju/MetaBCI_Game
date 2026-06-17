@@ -128,12 +128,10 @@ func _on_scoring(_ring: int, _points: int) -> void:
 	var combo: int = _last_result.get("combo_count", 0)
 	if ring == 0:
 		AudioManager.play_miss()
-	elif ring == 10:
-		AudioManager.play_hit(10)
-	elif combo >= 3:
-		AudioManager.play_combo(combo)
 	else:
 		AudioManager.play_hit(ring)
+		if combo >= 2:
+			AudioManager.play_combo(combo)
 
 
 func _on_finished(_final_score: int) -> void:

@@ -76,7 +76,10 @@ func play_bow_shoot() -> void:
 
 func play_hit(ring: int) -> void:
 	if ring == 10:
-		_play_cached("hit_10", -3.0)
+		# 先命中声，150ms 后十环叮声
+		_play_cached("hit", -6.0)
+		var timer := get_tree().create_timer(0.15)
+		timer.timeout.connect(func(): _play_cached("hit_10", -3.0))
 	else:
 		var player := _create_player()
 		player.stream = _sound_cache.get("hit", _gen_hit())
@@ -107,7 +110,7 @@ func play_charge() -> void:
 	_charge_player = _create_player()
 	_charge_player.stream = _sound_cache["charge"]
 	_charge_player.pitch_scale = 0.5
-	_charge_player.volume_db = -16.0
+	_charge_player.volume_db = -8.0
 	_charge_player.finished.connect(_on_charge_loop_finished)
 	add_child(_charge_player)
 	_charge_player.play()
@@ -123,8 +126,8 @@ func update_charge(progress: float) -> void:
 		return
 	# 音高攀升 0.5→2.0: 模拟弓弦越拉越紧
 	_charge_player.pitch_scale = lerpf(0.5, 2.0, clampf(progress, 0.0, 1.0))
-	# 音量渐强 -16→-4dB
-	_charge_player.volume_db = lerpf(-16.0, -4.0, clampf(progress, 0.0, 1.0))
+	# 音量渐强 -8→-2dB
+	_charge_player.volume_db = lerpf(-8.0, -2.0, clampf(progress, 0.0, 1.0))
 
 
 func stop_charge() -> void:
