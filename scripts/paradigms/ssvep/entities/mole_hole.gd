@@ -32,10 +32,8 @@ func _setup_mole_sprite() -> void:
 		var target_w := hole_radius * 2.8
 		_base_scale = target_w / maxf(tex.get_width(), 1.0)
 		_mole_sprite.scale = Vector2.ONE * _base_scale
-	# 冒出位置: 地鼠底部在洞口中心
-	_shown_y = -hole_radius * 0.8 - tex.get_height() * _base_scale / 2.0
-	# 隐藏位置: 地鼠完全在洞口下方
-	_hidden_y = hole_radius * 0.6
+		_shown_y = -hole_radius * 0.3 - tex.get_height() * _base_scale / 2.0
+		_hidden_y = hole_radius * 0.15
 	_mole_sprite.position = Vector2(0, _hidden_y)
 	_mole_sprite.visible = false
 	add_child(_mole_sprite)
