@@ -54,6 +54,7 @@ func _setup_background() -> void:
 func _setup_game() -> void:
 	_snake = MindSnake.new()
 	_snake.name = "Snake"
+	_snake.reset()
 	add_child(_snake)
 
 	_arrows = SSVEPArrows.new()
@@ -85,18 +86,14 @@ func _exit_tree() -> void:
 func _enter_ready() -> void:
 	_state = State.READY
 	_state_timer = 2.0
-	_playing_entered = false
+	_arrows.visible = false
 	_hud.update_state("准备...")
 
 
-var _playing_entered: bool = false
-
 func _enter_playing() -> void:
-	if _playing_entered:
-		return
-	_playing_entered = true
 	_state = State.PLAYING
-	_snake.reset()
+	_snake.paused = false
+	_arrows.visible = true
 	_hud.update_state("")
 	_hud.update_score(0)
 	_food.spawn(_snake.body)
@@ -117,6 +114,7 @@ func _process(delta: float) -> void:
 				_enter_playing()
 
 		State.PLAYING:
+			_arrows.follow(_snake.get_head_screen_pos())
 			if not _snake.alive:
 				_enter_game_over()
 				return

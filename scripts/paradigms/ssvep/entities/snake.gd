@@ -19,6 +19,7 @@ var _tick_timer: float = 0.0
 var _tick_interval: float = 0.3
 var _grow_pending: int = 0
 var alive: bool = true
+var paused: bool = true
 var score: int = 0
 var grid_offset: Vector2
 
@@ -40,6 +41,7 @@ func reset() -> void:
 	_tick_interval = 0.3
 	_grow_pending = 0
 	alive = true
+	paused = true
 	score = 0
 	queue_redraw()
 
@@ -55,7 +57,7 @@ func set_direction(dir_name: String) -> void:
 
 
 func _process(delta: float) -> void:
-	if not alive:
+	if not alive or paused:
 		return
 	_tick_timer += delta
 	if _tick_timer >= _tick_interval:
@@ -98,6 +100,10 @@ func get_head() -> Vector2i:
 	return body[0]
 
 
+func get_head_screen_pos() -> Vector2:
+	return Vector2(body[0]) * CELL + grid_offset + Vector2.ONE * CELL / 2.0
+
+
 func _draw() -> void:
 	if body.is_empty():
 		return
@@ -107,7 +113,8 @@ func _draw() -> void:
 		var pos := Vector2(seg) * CELL + Vector2.ONE * CELL / 2.0 + grid_offset
 		var color: Color
 		if i == 0:
-			color = Color("4A90D9")      # 头 — 蓝
+			color = Color("4A90D9")
+			draw_rect(Rect2(pos - Vector2.ONE * CELL / 2.0, Vector2.ONE * CELL), color, true)  # 头大
 		else:
 			var t := float(i) / float(body.size())
 			color = Color("4A90D9").darkened(t * 0.6)
