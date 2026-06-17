@@ -160,7 +160,7 @@ func _process(delta: float) -> void:
 		var progress := _sm.get_aiming_progress()
 		_hud.update_timer(progress)
 		AudioManager.update_charge(progress)
-		_distractor_spawner.update_spawning(delta, _current_focus, _sm.current_round + 1)
+		_distractor_spawner.update_spawning(delta, _mode.combo)
 
 		# 检查瞄准是否到期，触发射箭
 		if _sm._state_timer <= 0.0 and _crosshair.active:

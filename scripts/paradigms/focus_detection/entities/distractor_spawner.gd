@@ -28,24 +28,21 @@ func _process(_delta: float) -> void:
 		return
 
 
-## 每帧更新干扰物生成 (由外部调用，传入专注度和轮次)
-func update_spawning(delta: float, focus_ratio: float, round_num: int) -> void:
+## 每帧更新干扰物生成 (由外部调用，传入当前 combo 数)
+func update_spawning(delta: float, combo: int) -> void:
 	_spawn_timer += delta
 
-	# 专注度越低 → 生成越快
-	var focus_factor: float
-	if focus_ratio >= GlobalConfig.FOCUS_HIGH_THRESHOLD:
-		focus_factor = 0.3   # 高专注：很少干扰
-	elif focus_ratio >= GlobalConfig.FOCUS_MEDIUM_THRESHOLD:
-		focus_factor = 0.7   # 中专注：中等干扰
-	else:
-		focus_factor = 1.2   # 低专注：大量干扰
+	# combo<2: 无干扰
+	if combo < 2:
+		clear_all()
+		_spawn_timer = 0.0
+		return
 
-	# 轮次越高 → 干扰越多
-	var round_factor := 1.0 + (round_num - 1) * 0.25
-
-	_spawn_interval = 1.0 / (focus_factor * round_factor)
-	_max_distractors = int(clampf(3.0 + round_num * 1.5, 3, 12))
+	# combo 越高 → 干扰越密越多
+	# combo=2: 间隔1.2s, 上限3个
+	# combo=5: 间隔0.3s, 上限8个
+	_spawn_interval = 1.2 / float(combo)
+	_max_distractors = combo + 1
 
 	if _spawn_timer >= _spawn_interval:
 		_spawn_timer = 0.0
