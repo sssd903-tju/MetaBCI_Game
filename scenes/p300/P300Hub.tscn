@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://p300hub001"]
+
+[ext_resource type="Script" path="res://scripts/paradigms/p300/p300_hub.gd" id="1_h"]
+
+[node name="P300Hub" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+script = ExtResource("1_h")
