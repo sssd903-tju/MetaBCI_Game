@@ -38,11 +38,14 @@ func update_spawning(delta: float, combo: int) -> void:
 		_spawn_timer = 0.0
 		return
 
-	# combo 越高 → 干扰越密越多
-	# combo=2: 间隔1.2s, 上限3个
-	# combo=5: 间隔0.3s, 上限8个
-	_spawn_interval = 1.2 / float(combo)
-	_max_distractors = combo + 1
+	# combo 阶梯式增长
+	match combo:
+		2:
+			_spawn_interval = 0.6; _max_distractors = 3
+		3:
+			_spawn_interval = 0.4; _max_distractors = 4
+		_:
+			_spawn_interval = 0.2; _max_distractors = 8
 
 	if _spawn_timer >= _spawn_interval:
 		_spawn_timer = 0.0
