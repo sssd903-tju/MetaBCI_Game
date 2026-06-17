@@ -250,10 +250,9 @@ func _gen_charge_loop() -> AudioStreamWAV:
 		var t := float(i) / SAMPLE_RATE
 		var progress := float(i) / float(sample_count)
 
-		# 弦振动 — 奇次谐波为主（弦乐特征）
-		var string_tone := sin(2.0 * PI * base_freq * t) * 0.06
-		string_tone += sin(2.0 * PI * base_freq * 3.0 * t) * 0.03   # 3次谐波
-		string_tone += sin(2.0 * PI * base_freq * 5.0 * t) * 0.015  # 5次谐波
+		# 弦振动 — 仅奇次谐波，无基频（弓弦质感）
+		var string_tone := sin(2.0 * PI * base_freq * 3.0 * t) * 0.04   # 3次谐波
+		string_tone += sin(2.0 * PI * base_freq * 5.0 * t) * 0.02        # 5次谐波
 
 		# 细微频率滑动 (模拟弓弦逐渐拉紧)
 		var sweep := 1.0 + progress * 0.15
