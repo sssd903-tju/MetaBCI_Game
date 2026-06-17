@@ -51,8 +51,12 @@ func update_round(r: int) -> void:
 	round_label.text = "第 %d / 5 轮" % r
 
 
-func show_result(guessed: String, correct: bool) -> void:
-	state_label.text = "系统猜测: %s — %s" % [guessed, "正确 ✓" if correct else "错误 ✗"]
+func hide_result() -> void:
+	state_label.text = ""
+
+
+func show_confirm() -> void:
+	state_label.text = "猜对了吗?  Y = 是  /  N = 否"
 
 
 func show_final(score: int, correct: int, wrong: int, rating: String) -> void:

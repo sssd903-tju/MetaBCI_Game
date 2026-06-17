@@ -113,3 +113,8 @@ func reveal_all() -> void:
 func hide_all() -> void:
 	for c in cards:
 		c.flip(false)
+		c.scale = Vector2.ONE
+
+
+func enlarge_card(idx: int) -> void:
+	cards[idx].scale = Vector2.ONE * 1.3
