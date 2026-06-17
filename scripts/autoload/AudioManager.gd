@@ -39,9 +39,9 @@ func _ready() -> void:
 	print("[AudioManager] 音效就绪 (外部:%d/程序化:%d)" % [ext_count, _sound_cache.size() - ext_count])
 
 
-func _load_external(name: String) -> AudioStream:
+func _load_external(base_name: String) -> AudioStream:
 	for ext in [".ogg", ".wav", ".mp3"]:
-		var path: String = AUDIO_DIR + "/" + name + ext
+		var path: String = AUDIO_DIR + "/" + base_name + ext
 		if ResourceLoader.exists(path):
 			var s: AudioStream = load(path)
 			if s:

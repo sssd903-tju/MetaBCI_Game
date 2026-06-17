@@ -12,7 +12,6 @@ signal mole_shown(hole_index: int)
 signal decode_started()
 signal hit_detected(hole_index: int)
 signal miss_detected()
-signal scored(result: Dictionary)
 signal finished(final_score: int)
 
 var current_state: State = State.READY
