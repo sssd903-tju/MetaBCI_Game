@@ -99,6 +99,7 @@ func _on_decode_start() -> void:
 func _on_hit(_hole_index: int) -> void:
 	var result := _mode.record_hit()
 	_hud.show_result("打到了！ +%d" % result.points, GlobalConfig.UI_SUCCESS)
+	_grid.play_hammer_hit()
 	_hud.update_combo(result.combo)
 	_update_hud()
 	AudioManager.play_combo(1)
