@@ -58,7 +58,7 @@ func _setup() -> void:
 	# 结果弹窗
 	_result_label = _lbl("", 22, GlobalConfig.UI_ACCENT)
 	_result_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_result_label.position = Vector2(0, GlobalConfig.GAME_HEIGHT / 2.0 + 200)
+	_result_label.position = Vector2(0, GlobalConfig.GAME_HEIGHT - 100)
 	_result_label.size = Vector2(GlobalConfig.GAME_WIDTH, 30)
 	add_child(_result_label)
 

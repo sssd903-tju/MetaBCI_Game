@@ -10,7 +10,7 @@ const COLOR_POOL := [
 
 var holes: Array[MoleHole] = []
 var active_hole_index: int = -1
-var _hammer_node: Node2D = null
+var _hammer_sprite: Sprite2D = null
 
 
 func _ready() -> void:
@@ -18,26 +18,15 @@ func _ready() -> void:
 
 
 func _setup_hammer() -> void:
-	_hammer_node = Node2D.new()
-	_hammer_node.name = "Hammer"
-	_hammer_node.visible = false
-	_hammer_node.z_index = 10
-
-	# 锤柄 (细长矩形)
-	var handle := ColorRect.new()
-	handle.color = Color("6B4226")
-	handle.size = Vector2(6, 50)
-	handle.position = Vector2(-3, -10)
-
-	# 锤头 (粗矩形)
-	var head := ColorRect.new()
-	head.color = Color("4A4A4A")
-	head.size = Vector2(40, 22)
-	head.position = Vector2(-20, -32)
-
-	_hammer_node.add_child(handle)
-	_hammer_node.add_child(head)
-	add_child(_hammer_node)
+	_hammer_sprite = Sprite2D.new()
+	_hammer_sprite.name = "Hammer"
+	_hammer_sprite.visible = false
+	_hammer_sprite.z_index = 10
+	var tex: Texture2D = load("res://assets/textures/hammer.jpeg")
+	if tex:
+		_hammer_sprite.texture = tex
+		_hammer_sprite.scale = Vector2(0.15, 0.15)
+	add_child(_hammer_sprite)
 
 
 
@@ -75,7 +64,7 @@ func _spacing(count: int) -> float:
 		2: return 300.0
 		3: return 320.0
 		4: return 300.0
-		5: return 340.0
+		5: return 400.0
 		_: return 300.0
 
 
@@ -129,18 +118,18 @@ func hide_current_mole() -> void:
 
 ## 锤子敲击动画
 func play_hammer_hit() -> void:
-	if active_hole_index < 0 or _hammer_node == null:
+	if active_hole_index < 0 or _hammer_sprite == null:
 		return
 	var target_pos := holes[active_hole_index].position
-	_hammer_node.position = target_pos + Vector2(30, -40)
-	_hammer_node.visible = true
-	_hammer_node.rotation = -0.6
+	_hammer_sprite.position = target_pos + Vector2(40, -50)
+	_hammer_sprite.visible = true
+	_hammer_sprite.rotation = -0.6
 
 	var tween := create_tween()
 	tween.set_ease(Tween.EASE_IN)
-	tween.tween_property(_hammer_node, "rotation", 0.15, 0.12)
-	tween.parallel().tween_property(_hammer_node, "position:y", target_pos.y - 20, 0.12)
-	tween.tween_property(_hammer_node, "visible", false, 0.0).set_delay(0.25)
+	tween.tween_property(_hammer_sprite, "rotation", 0.15, 0.12)
+	tween.parallel().tween_property(_hammer_sprite, "position:y", target_pos.y - 20, 0.12)
+	tween.tween_property(_hammer_sprite, "visible", false, 0.0).set_delay(0.25)
 
 
 func get_active_frequency() -> float:
