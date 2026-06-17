@@ -1,3 +1,6 @@
-[gd_scene format=3 uid="uid://mindsnake001"]
+[gd_scene load_steps=2 format=3 uid="uid://mindsnake001"]
+
+[ext_resource type="Script" path="res://scripts/paradigms/ssvep/mind_snake_paradigm.gd" id="1_paradigm"]
 
 [node name="MindSnakeGame" type="Node2D"]
+script = ExtResource("1_paradigm")
