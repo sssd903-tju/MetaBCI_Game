@@ -175,7 +175,7 @@ func _input(event: InputEvent) -> void:
 		if event is InputEventKey and event.pressed:
 			var key_map := {KEY_1: 0, KEY_2: 1, KEY_3: 2, KEY_4: 3, KEY_5: 4}
 			if event.keycode in key_map:
-				var idx := key_map[event.keycode]
+				var idx: int = key_map[event.keycode]
 				if idx < _grid.holes.size():
 					_selected_hole = idx
 
