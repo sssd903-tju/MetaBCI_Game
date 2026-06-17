@@ -125,6 +125,6 @@ func collect_asteroid(idx: int) -> Dictionary:
 	var a := asteroids[idx]
 	var result := {"name": a.ore_name, "value": a.ore_value}
 	# 更换新矿石
-	var new_ore := ORE_POOL[randi() % ORE_POOL.size()]
+	var new_ore: Dictionary = ORE_POOL[randi() % ORE_POOL.size()]
 	a.setup(new_ore.name, new_ore.icon, new_ore.value)
 	return result
