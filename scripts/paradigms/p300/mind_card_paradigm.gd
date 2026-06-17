@@ -89,7 +89,7 @@ func _on_scan_done() -> void:
 
 
 func _on_reveal(idx: int) -> void:
-	var sym := CardGrid.SYMBOLS[idx]
+	var sym: String = CardGrid.SYMBOLS[idx]
 	_grid.reveal_all()
 	var correct := (idx == _target_idx)
 	_last_correct = correct
