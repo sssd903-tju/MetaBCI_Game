@@ -1,8 +1,7 @@
 extends Node2D
 class_name SnakeFood
-## Food — 随机位置食物
 
-var _position: Vector2i = Vector2i.ZERO
+var _cell: Vector2i = Vector2i(-1, -1)
 var _grid_offset: Vector2
 
 
@@ -22,16 +21,16 @@ func spawn(snake_body: Array[Vector2i]) -> void:
 				candidates.append(p)
 	if candidates.is_empty():
 		return
-	_position = candidates[randi() % candidates.size()]
+	_cell = candidates[randi() % candidates.size()]
 	queue_redraw()
 
 
 func get_cell() -> Vector2i:
-	return _position
+	return _cell
 
 
 func _draw() -> void:
-	if _position == Vector2i.ZERO:
+	if _cell.x < 0:
 		return
-	var pos := Vector2(_position) * MindSnake.CELL + _grid_offset + Vector2.ONE * MindSnake.CELL / 2.0
+	var pos := Vector2(_cell) * MindSnake.CELL + _grid_offset + Vector2.ONE * MindSnake.CELL / 2.0
 	draw_circle(pos, MindSnake.CELL / 2.0 - 2, Color("E04040"))
