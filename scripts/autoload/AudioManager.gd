@@ -263,11 +263,11 @@ func _gen_charge_loop() -> AudioStreamWAV:
 		var value := 0.0
 
 		# 检查是否在摩擦事件中
-		for c in creaks:
-			var elapsed := now - c.start
+		for c: Dictionary in creaks:
+			var elapsed: float = now - c.start
 			if elapsed >= 0 and elapsed < c.duration:
 				# 摩擦噪声 — 带通滤波模拟 (简单粗暴: 白噪 × 衰减包络)
-				var env := 1.0 - (elapsed / c.duration)
+				var env: float = 1.0 - (elapsed / c.duration)
 				value += randf_range(-1.0, 1.0) * c.amp * env
 				break
 
