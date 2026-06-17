@@ -8,7 +8,7 @@ func _ready() -> void:
 	add_child(bg)
 
 	var title := _lbl("SSVEP 稳态视觉诱发电位", 28, GlobalConfig.UI_TEXT_PRIMARY)
-	title.position = Vector2(0, 200)
+	title.position = Vector2(0, 240)
 	title.size = Vector2(GlobalConfig.GAME_WIDTH, 40)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
@@ -22,8 +22,23 @@ func _ready() -> void:
 		var m: Dictionary = modes[i]
 		var btn := Button.new()
 		btn.text = m.name
-		btn.position = Vector2((GlobalConfig.GAME_WIDTH - 300) / 2.0, 300 + i * 60)
-		btn.size = Vector2(300, 48)
+		btn.position = Vector2((GlobalConfig.GAME_WIDTH - 400) / 2.0, 340 + i * 70)
+		btn.size = Vector2(400, 56)
+
+		var btn_style := StyleBoxFlat.new()
+		btn_style.bg_color = GlobalConfig.BG_WARM_CREAM
+		btn_style.border_color = GlobalConfig.PLATFORM_NORMAL
+		btn_style.border_width_left = 2
+		btn_style.border_width_right = 2
+		btn_style.border_width_top = 2
+		btn_style.border_width_bottom = 2
+		btn_style.corner_radius_top_left = 10
+		btn_style.corner_radius_top_right = 10
+		btn_style.corner_radius_bottom_left = 10
+		btn_style.corner_radius_bottom_right = 10
+		btn.add_theme_stylebox_override("normal", btn_style)
+		btn.add_theme_font_size_override("font_size", 20)
+		btn.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_PRIMARY)
 		btn.pressed.connect(_load_scene.bind(m.scene))
 		add_child(btn)
 
