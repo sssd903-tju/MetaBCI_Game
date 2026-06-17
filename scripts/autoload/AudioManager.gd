@@ -90,11 +90,15 @@ func play_miss() -> void:
 
 
 func play_combo(combo_count: int) -> void:
-	var player := _create_player()
-	player.stream = _sound_cache.get("combo", _gen_combo())
-	player.pitch_scale = 0.8 + combo_count * 0.15
-	player.volume_db = -4.0
-	_add_and_play(player)
+	# 连击几次响几次，间隔 120ms
+	for i in range(combo_count):
+		var player := _create_player()
+		player.stream = _sound_cache.get("combo", _gen_combo())
+		player.volume_db = -6.0
+		add_child(player)
+		# 延迟播放
+		get_tree().create_timer(i * 0.12).timeout.connect(player.play)
+		player.finished.connect(_on_finished.bind(player))
 
 
 func play_charge() -> void:
