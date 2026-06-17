@@ -48,6 +48,7 @@ func _setup_background() -> void:
 func _setup_game() -> void:
 	_grid = MoleGrid.new()
 	_grid.name = "MoleGrid"
+	_grid.setup_for_round(1)  # 初始 2 洞
 	add_child(_grid)
 
 	_sm = WhackMoleStateMachine.new()
