@@ -63,6 +63,7 @@ func _setup_game() -> void:
 
 	# 信号
 	_sm.state_changed.connect(_on_state_changed)
+	_sm.ready_started.connect(_on_ready_start)
 	_sm.mole_shown.connect(_on_mole_shown)
 	_sm.decode_started.connect(_on_decode_start)
 	_sm.hit_detected.connect(_on_hit)
@@ -74,6 +75,12 @@ func _setup_game() -> void:
 
 func _on_state_changed(_old: WhackMoleStateMachine.State, _new: WhackMoleStateMachine.State) -> void:
 	pass
+
+
+func _on_ready_start() -> void:
+	# 每轮开始重建洞数
+	var r := _mode.current_round + 1
+	_grid.setup_for_round(r)
 
 
 func _on_mole_shown(_hole_index: int) -> void:
@@ -139,7 +146,7 @@ func _resolve_shot() -> void:
 		if randf() < 0.7:
 			detected = _grid.active_hole_index
 		else:
-			detected = randi() % 4
+			detected = randi() % _grid.holes.size()
 
 	if detected == _grid.active_hole_index:
 		_sm.trigger_hit(detected)
@@ -166,11 +173,11 @@ func _input(event: InputEvent) -> void:
 	# 键盘模拟 SSVEP 选择
 	if _sm.current_state == WhackMoleStateMachine.State.DECODE:
 		if event is InputEventKey and event.pressed:
-			match event.keycode:
-				KEY_1: _selected_hole = 0
-				KEY_2: _selected_hole = 1
-				KEY_3: _selected_hole = 2
-				KEY_4: _selected_hole = 3
+			var key_map := {KEY_1: 0, KEY_2: 1, KEY_3: 2, KEY_4: 3, KEY_5: 4}
+			if event.keycode in key_map:
+				var idx := key_map[event.keycode]
+				if idx < _grid.holes.size():
+					_selected_hole = idx
 
 
 func _restart() -> void:
