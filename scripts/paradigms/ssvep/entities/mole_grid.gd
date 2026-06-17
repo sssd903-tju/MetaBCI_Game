@@ -125,16 +125,16 @@ func play_hammer_hit() -> void:
 	if active_hole_index < 0 or _hammer_sprite == null:
 		return
 	var target_pos := holes[active_hole_index].position
-	_hammer_sprite.position = target_pos + Vector2(40, -50)
+	_hammer_sprite.position = target_pos + Vector2(0, -70)
 	_hammer_sprite.visible = true
-	move_child(_hammer_sprite, get_child_count() - 1)  # 移到最上层
-	_hammer_sprite.rotation = -0.6
+	move_child(_hammer_sprite, get_child_count() - 1)
+	_hammer_sprite.rotation = -1.0
 
 	var tween := create_tween()
 	tween.set_ease(Tween.EASE_IN)
-	tween.tween_property(_hammer_sprite, "rotation", 0.15, 0.12)
-	tween.parallel().tween_property(_hammer_sprite, "position:y", target_pos.y - 20, 0.12)
-	tween.tween_property(_hammer_sprite, "visible", false, 0.0).set_delay(0.25)
+	tween.tween_property(_hammer_sprite, "rotation", 0.0, 0.15)
+	tween.parallel().tween_property(_hammer_sprite, "position:y", target_pos.y - 10, 0.15)
+	tween.tween_property(_hammer_sprite, "visible", false, 0.0).set_delay(0.2)
 
 
 func get_active_frequency() -> float:
