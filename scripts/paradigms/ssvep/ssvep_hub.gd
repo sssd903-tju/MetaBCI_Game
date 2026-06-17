@@ -19,7 +19,7 @@ func _ready() -> void:
 	]
 
 	for i in range(modes.size()):
-		var m := modes[i]
+		var m: Dictionary = modes[i]
 		var btn := Button.new()
 		btn.text = m.name
 		btn.position = Vector2((GlobalConfig.GAME_WIDTH - 300) / 2.0, 300 + i * 60)
