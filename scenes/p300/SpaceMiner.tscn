@@ -1,3 +1,6 @@
-[gd_scene format=3 uid="uid://c8mt1etm4yiyy"]
+[gd_scene load_steps=2 format=3 uid="uid://spaceminer001"]
+
+[ext_resource type="Script" path="res://scripts/paradigms/p300/space_miner_paradigm.gd" id="1_p"]
 
 [node name="SpaceMiner" type="Node2D"]
+script = ExtResource("1_p")
