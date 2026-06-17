@@ -22,7 +22,7 @@ func _ready() -> void:
 		var m: Dictionary = modes[i]
 		var btn := Button.new()
 		btn.text = m.name
-		btn.position = Vector2((GlobalConfig.GAME_WIDTH - 400) / 2.0, 340 + i * 70)
+		btn.position = Vector2((GlobalConfig.GAME_WIDTH - 400) / 2.0, 380 + i * 100)
 		btn.size = Vector2(400, 56)
 
 		var btn_style := StyleBoxFlat.new()
