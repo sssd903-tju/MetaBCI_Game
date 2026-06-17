@@ -47,7 +47,7 @@ func reset() -> void:
 func set_direction(dir_name: String) -> void:
 	if not dirs.has(dir_name):
 		return
-	var nd := dirs[dir_name]
+	var nd: Vector2i = dirs[dir_name]
 	# 禁止反向
 	if nd == -direction:
 		return
@@ -117,7 +117,6 @@ func _draw() -> void:
 	if body.size() > 0:
 		var hp := Vector2(body[0]) * CELL + grid_offset + Vector2.ONE * CELL / 2.0
 		var ed := direction * CELL * 0.25
-		var es := Vector2(CELL * 0.35, CELL * 0.35) if direction.x != 0 else Vector2(CELL * 0.35, CELL * 0.35)
 		draw_circle(hp + ed - Vector2(0, CELL * 0.12), 3, Color.WHITE)
 		draw_circle(hp + ed + Vector2(0, CELL * 0.12), 3, Color.WHITE)
 		draw_circle(hp + ed - Vector2(0, CELL * 0.12), 1.5, Color.BLACK)
