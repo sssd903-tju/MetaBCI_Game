@@ -57,7 +57,7 @@ func _spawn_one() -> void:
 	var d := Distractor.new()
 
 	# 随机大小
-	var radius := randf_range(8.0, 22.0)
+	var radius := randf_range(14.0, 30.0)
 
 	# 从屏幕边缘生成
 	var side := randi() % 4
@@ -72,7 +72,7 @@ func _spawn_one() -> void:
 
 	# 穿过靶心附近的随机轨迹
 	var tc := Vector2(GlobalConfig.GAME_WIDTH / 2.0, GlobalConfig.GAME_HEIGHT / 2.0 + 60)
-	var target := tc + Vector2(randf_range(-250, 250), randf_range(-200, 200))
+	var target := tc + Vector2(randf_range(-160, 160), randf_range(-130, 130))
 	var dir := (target - start_pos).normalized()
 	var speed := randf_range(40.0, 100.0)
 	var velocity := dir * speed
