@@ -12,6 +12,7 @@ var _hud: MindSnakeHUD
 var _state_timer: float = 0.0
 var _decode_timer: float = 0.0
 var _decoded_dir: String = ""
+var _food_spawned: bool = false
 
 
 func _ready() -> void:
@@ -91,7 +92,7 @@ func _enter_ready() -> void:
 func _enter_playing() -> void:
 	_state = State.PLAYING
 	_snake.reset()
-	_food.spawn(_snake.body)
+	_food_spawned = false
 	_hud.update_state("")
 	_hud.update_score(0)
 
@@ -114,6 +115,11 @@ func _process(delta: float) -> void:
 			if not _snake.alive:
 				_enter_game_over()
 				return
+
+			# 首次进入，延迟生成食物
+			if not _food_spawned:
+				_food_spawned = true
+				_food.spawn(_snake.body)
 
 			# SSVEP 解码 (每 0.5s 检查一次方向)
 			_decode_timer += delta
