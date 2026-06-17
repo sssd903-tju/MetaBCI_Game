@@ -106,9 +106,8 @@ func play_charge() -> void:
 		stop_charge()
 	_charge_player = _create_player()
 	_charge_player.stream = _sound_cache["charge"]
-	_charge_player.volume_db = -10.0
-	if _is_procedural("charge"):
-		_charge_player.pitch_scale = 0.7
+	_charge_player.pitch_scale = 0.5
+	_charge_player.volume_db = -16.0
 	_charge_player.finished.connect(_on_charge_loop_finished)
 	add_child(_charge_player)
 	_charge_player.play()
@@ -122,9 +121,10 @@ func _on_charge_loop_finished() -> void:
 func update_charge(progress: float) -> void:
 	if not _charge_player:
 		return
-	if _is_procedural("charge"):
-		_charge_player.pitch_scale = lerpf(0.7, 1.5, clampf(progress, 0.0, 1.0))
-	_charge_player.volume_db = lerpf(-12.0, -6.0, clampf(progress, 0.0, 1.0))
+	# 音高攀升 0.5→2.0: 模拟弓弦越拉越紧
+	_charge_player.pitch_scale = lerpf(0.5, 2.0, clampf(progress, 0.0, 1.0))
+	# 音量渐强 -16→-4dB
+	_charge_player.volume_db = lerpf(-16.0, -4.0, clampf(progress, 0.0, 1.0))
 
 
 func stop_charge() -> void:
