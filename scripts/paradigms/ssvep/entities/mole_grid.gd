@@ -22,10 +22,13 @@ func _setup_hammer() -> void:
 	_hammer_sprite.name = "Hammer"
 	_hammer_sprite.visible = false
 	_hammer_sprite.z_index = 10
-	var tex: Texture2D = load("res://assets/textures/hammer.jpeg")
+	var tex: Texture2D = load("res://assets/textures/hammer.png")
 	if tex:
 		_hammer_sprite.texture = tex
 		_hammer_sprite.scale = Vector2(0.3, 0.3)
+		print("[MoleGrid] 锤子贴图加载成功: ", tex.get_size())
+	else:
+		print("[MoleGrid] 锤子贴图加载失败!")
 	add_child(_hammer_sprite)
 	_hammer_sprite.z_index = 100  # 确保在最上层
 
