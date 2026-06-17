@@ -154,7 +154,7 @@ func show_final(total: int, rating: String, best_combo: int, bullseyes: int) -> 
 	hint.name = "FinalHint"
 	hint.text = "按 Enter 重新开始 | ESC 返回"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.position = Vector2(0, 145)
+	hint.position = Vector2(0, 190)
 	hint.size = Vector2(GlobalConfig.GAME_WIDTH, 24)
 	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_SECONDARY)
