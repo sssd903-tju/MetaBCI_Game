@@ -79,8 +79,8 @@ func _process(delta: float) -> void:
 	elif focus_ratio >= GlobalConfig.FOCUS_MEDIUM_THRESHOLD:
 		# 中专注：慢速靠拢，高抖动
 		direction = to_center.normalized()
-		speed = base_speed * 0.22
-		_update_jitter(delta, 1.2)
+		speed = base_speed * 0.50
+		_update_jitter(delta, 0.5)
 
 	else:
 		# 低专注：向外漂移 + 强烈抖动
