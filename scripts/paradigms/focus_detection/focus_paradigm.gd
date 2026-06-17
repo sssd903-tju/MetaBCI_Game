@@ -13,6 +13,7 @@ var _hud: ArcheryHUD
 # 当前专注度
 var _current_focus := 1.5
 var _peek_focus := 1.5  # 射箭时刻的专注度
+var _last_result: Dictionary = {}  # 最近一次射箭结果
 
 
 func _ready() -> void:
@@ -115,15 +116,15 @@ func _on_fired() -> void:
 		_peek_focus = _current_focus
 
 
-func _on_scoring(ring: int, points: int) -> void:
+func _on_scoring(_ring: int, _points: int) -> void:
 	_hud.update_round(_sm.current_round)
 	_hud.update_score(_mode.total_score)
-	_hud.show_result(ring, points)
+	_hud.show_result(_last_result)
 
 
-func _on_finished(final_score: int) -> void:
+func _on_finished(_final_score: int) -> void:
 	var summary := _mode.get_summary()
-	_hud.show_final(summary.total_score, summary.rating)
+	_hud.show_final(summary.total_score, summary.rating, summary.best_combo, summary.bullseyes)
 
 
 # --- 主循环 ---
@@ -144,8 +145,8 @@ func _process(delta: float) -> void:
 ## 射箭：计算环数，记录分数，触发布状态机
 func _fire_arrow() -> void:
 	var ring := _crosshair.get_hit_ring(_target)
-	var result := _mode.record_shot(ring, _peek_focus)
-	_sm.trigger_fire(result.ring, result.total_points)
+	_last_result = _mode.record_shot(ring, _peek_focus)
+	_sm.trigger_fire(_last_result.ring, _last_result.total_points)
 
 
 # --- 键盘输入 ---

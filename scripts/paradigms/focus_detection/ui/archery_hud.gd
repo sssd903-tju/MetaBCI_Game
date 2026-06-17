@@ -114,12 +114,22 @@ func update_focus(ratio: float) -> void:
 	_focus_label.text = "专注度: %.1f" % ratio
 
 
-func show_result(ring: int, points: int) -> void:
+func show_result(result: Dictionary) -> void:
+	var ring: int = result.get("ring", 0)
+	var points: int = result.get("total_points", 0)
+	var combo_count: int = result.get("combo_count", 0)
+	var is_bullseye: bool = result.get("is_bullseye", false)
+
 	if ring == 0:
-		_result_label.text = "脱靶！  +0"
+		_result_label.text = "脱靶！  +0  连击中断"
 		_result_label.add_theme_color_override("font_color", GlobalConfig.UI_DANGER)
 	else:
-		_result_label.text = "%d 环！  +%d" % [ring, points]
+		var text := "%d 环！  +%d" % [ring, points]
+		if is_bullseye:
+			text = "🎯 " + text + "  十环！"
+		if combo_count >= 2:
+			text += "  ×%d 连击！" % combo_count
+		_result_label.text = text
 		_result_label.add_theme_color_override("font_color", GlobalConfig.focus_to_color(float(ring) * 0.4))
 
 
@@ -127,12 +137,17 @@ func hide_result() -> void:
 	_result_label.text = ""
 
 
-func show_final(total: int, rating: String) -> void:
-	_state_label.position = Vector2(0, 60)
+func show_final(total: int, rating: String, best_combo: int, bullseyes: int) -> void:
+	_state_label.position = Vector2(0, 50)
 	_state_label.text = "游戏结束"
 	_state_label.add_theme_font_size_override("font_size", 28)
-	_result_label.position = Vector2(0, 110)
-	_result_label.text = "总分: %d  —  %s" % [total, rating]
+	_result_label.position = Vector2(0, 95)
+	var text := "总分: %d  —  %s" % [total, rating]
+	if best_combo >= 2:
+		text += "\n最佳连击: ×%d" % best_combo
+	if bullseyes > 0:
+		text += "  |  🎯 ×%d" % bullseyes
+	_result_label.text = text
 	_result_label.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_PRIMARY)
 
 	var hint := Label.new()
