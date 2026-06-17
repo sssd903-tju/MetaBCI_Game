@@ -85,10 +85,16 @@ func _exit_tree() -> void:
 func _enter_ready() -> void:
 	_state = State.READY
 	_state_timer = 2.0
+	_playing_entered = false
 	_hud.update_state("准备...")
 
 
+var _playing_entered: bool = false
+
 func _enter_playing() -> void:
+	if _playing_entered:
+		return
+	_playing_entered = true
 	_state = State.PLAYING
 	_snake.reset()
 	_hud.update_state("")
