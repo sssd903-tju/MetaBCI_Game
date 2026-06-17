@@ -2,8 +2,8 @@ extends Node2D
 class_name MindSnake
 ## Snake — 网格贪吃蛇
 
-const CELL := 30
-const GRID_W := 36
+const CELL := 35
+const GRID_W := 40
 const GRID_H := 22
 var dirs := {
 	"up":    Vector2i(0, -1),
@@ -118,7 +118,7 @@ func _draw() -> void:
 		var color: Color
 		if i == 0:
 			color = Color("4A90D9")
-			draw_rect(Rect2(pos - Vector2.ONE * CELL / 2.0, Vector2.ONE * CELL), color, true)  # 头大
+			draw_circle(pos, CELL / 2.0 + 2, color)  # 圆头更大
 		else:
 			var t := float(i) / float(body.size())
 			color = Color("4A90D9").darkened(t * 0.6)
