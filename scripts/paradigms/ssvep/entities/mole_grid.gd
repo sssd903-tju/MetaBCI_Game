@@ -25,8 +25,9 @@ func _setup_hammer() -> void:
 	var tex: Texture2D = load("res://assets/textures/hammer.jpeg")
 	if tex:
 		_hammer_sprite.texture = tex
-		_hammer_sprite.scale = Vector2(0.15, 0.15)
+		_hammer_sprite.scale = Vector2(0.3, 0.3)
 	add_child(_hammer_sprite)
+	_hammer_sprite.z_index = 100  # 确保在最上层
 
 
 
@@ -123,6 +124,7 @@ func play_hammer_hit() -> void:
 	var target_pos := holes[active_hole_index].position
 	_hammer_sprite.position = target_pos + Vector2(40, -50)
 	_hammer_sprite.visible = true
+	move_child(_hammer_sprite, get_child_count() - 1)  # 移到最上层
 	_hammer_sprite.rotation = -0.6
 
 	var tween := create_tween()
