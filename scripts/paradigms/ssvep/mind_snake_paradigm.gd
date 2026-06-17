@@ -156,13 +156,13 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		ParadigmManager.go_to_main_menu()
 
-	# 方向键 → 模拟 SSVEP 解码
+	# 方向键 → 立即改变方向
 	if event is InputEventKey and event.pressed and _state == State.PLAYING:
 		match event.keycode:
-			KEY_UP, KEY_W:     _decoded_dir = "up"
-			KEY_DOWN, KEY_S:   _decoded_dir = "down"
-			KEY_LEFT, KEY_A:   _decoded_dir = "left"
-			KEY_RIGHT, KEY_D:  _decoded_dir = "right"
+			KEY_UP, KEY_W:     _snake.set_direction("up"); _decoded_dir = "up"
+			KEY_DOWN, KEY_S:   _snake.set_direction("down"); _decoded_dir = "down"
+			KEY_LEFT, KEY_A:   _snake.set_direction("left"); _decoded_dir = "left"
+			KEY_RIGHT, KEY_D:  _snake.set_direction("right"); _decoded_dir = "right"
 
 
 func _restart() -> void:

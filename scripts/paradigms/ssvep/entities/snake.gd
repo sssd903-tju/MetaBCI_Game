@@ -16,7 +16,7 @@ var body: Array[Vector2i] = []
 var direction: Vector2i = dirs["right"]
 var next_direction: Vector2i = dirs["right"]
 var _tick_timer: float = 0.0
-var _tick_interval: float = 0.3
+var _tick_interval: float = 0.2
 var _grow_pending: int = 0
 var alive: bool = true
 var paused: bool = true
@@ -38,7 +38,7 @@ func reset() -> void:
 	body = [Vector2i(cx, cy), Vector2i(cx - 1, cy), Vector2i(cx - 2, cy)]
 	direction = dirs["right"]
 	next_direction = dirs["right"]
-	_tick_interval = 0.3
+	_tick_interval = 0.2
 	_grow_pending = 0
 	alive = true
 	paused = true
