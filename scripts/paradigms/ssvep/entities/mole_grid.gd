@@ -125,10 +125,10 @@ func play_hammer_hit() -> void:
 	if active_hole_index < 0 or _hammer_sprite == null:
 		return
 	var target_pos := holes[active_hole_index].position
-	_hammer_sprite.position = target_pos + Vector2(50, -70)
+	_hammer_sprite.position = target_pos + Vector2(80, -90)
 	_hammer_sprite.visible = true
 	move_child(_hammer_sprite, get_child_count() - 1)
-	_hammer_sprite.rotation = -1.8
+	_hammer_sprite.rotation = -2.4
 
 	var tween := create_tween()
 	tween.set_ease(Tween.EASE_IN)
