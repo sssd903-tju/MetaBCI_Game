@@ -118,7 +118,7 @@ func _draw() -> void:
 		var color: Color
 		if i == 0:
 			color = Color("4A90D9")
-			draw_circle(pos, CELL / 2.0 + 2, color)  # 圆头更大
+			draw_rect(Rect2(pos - Vector2.ONE * CELL / 2.0 - Vector2.ONE * 2, Vector2.ONE * CELL + Vector2.ONE * 4), color, true)  # 方头大
 		else:
 			var t := float(i) / float(body.size())
 			color = Color("4A90D9").darkened(t * 0.6)
