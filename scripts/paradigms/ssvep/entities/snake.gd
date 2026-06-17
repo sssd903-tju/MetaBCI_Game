@@ -105,6 +105,10 @@ func get_head_screen_pos() -> Vector2:
 
 
 func _draw() -> void:
+	# 网格边框
+	var border_rect := Rect2(grid_offset, Vector2(GRID_W * CELL, GRID_H * CELL))
+	draw_rect(border_rect, Color("3F6850"), false, 3.0)
+
 	if body.is_empty():
 		return
 
