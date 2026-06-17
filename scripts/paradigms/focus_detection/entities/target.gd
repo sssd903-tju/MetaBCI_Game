@@ -11,16 +11,16 @@ var ring_width: float:
 
 # 环颜色 (从外到内 1→10)
 const RING_COLORS := [
-	Color("F0ECE0"),  #  1环 — 米白
-	Color("F0ECE0"),  #  2环
-	Color("7BA5C0"),  #  3环 — 亮蓝
-	Color("7BA5C0"),  #  4环
-	Color("D47A5A"),  #  5环 — 暖橙
-	Color("D47A5A"),  #  6环
-	Color("E8B84A"),  #  7环 — 亮金
-	Color("E8B84A"),  #  8环
-	Color("D94848"),  #  9环 — 亮红
-	Color("D94848"),  # 10环 — 红心
+	Color("ECF0F2"),  #  1环 — 冷白
+	Color("ECF0F2"),  #  2环
+	Color("6E9DBF"),  #  3环 — 蓝
+	Color("6E9DBF"),  #  4环
+	Color("7B9DB5"),  #  5环 — 灰蓝
+	Color("7B9DB5"),  #  6环
+	Color("B8A87A"),  #  7环 — 冷金
+	Color("B8A87A"),  #  8环
+	Color("C45A5A"),  #  9环 — 冷红
+	Color("C45A5A"),  # 10环 — 红心
 ]
 
 # 环对应分数 1-10
