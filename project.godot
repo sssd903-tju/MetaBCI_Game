@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 GlobalConfig="*res://scripts/autoload/GlobalConfig.gd"
 BCIConnector="*res://scripts/autoload/BCIConnector.gd"
 ParadigmManager="*res://scripts/autoload/ParadigmManager.gd"
+AudioManager="*res://scripts/autoload/AudioManager.gd"
 
 [display]
 

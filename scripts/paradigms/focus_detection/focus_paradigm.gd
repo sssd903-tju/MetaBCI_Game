@@ -121,6 +121,18 @@ func _on_scoring(_ring: int, _points: int) -> void:
 	_hud.update_score(_mode.total_score)
 	_hud.show_result(_last_result)
 
+	# 音效
+	var ring: int = _last_result.get("ring", 0)
+	var combo: int = _last_result.get("combo_count", 0)
+	if ring == 0:
+		AudioManager.play_miss()
+	elif ring == 10:
+		AudioManager.play_hit(10)
+	elif combo >= 3:
+		AudioManager.play_combo(combo)
+	else:
+		AudioManager.play_hit(ring)
+
 
 func _on_finished(_final_score: int) -> void:
 	var summary := _mode.get_summary()
@@ -144,6 +156,7 @@ func _process(delta: float) -> void:
 
 ## 射箭：计算环数，记录分数，触发布状态机
 func _fire_arrow() -> void:
+	AudioManager.play_bow_shoot()
 	var ring := _crosshair.get_hit_ring(_target)
 	_last_result = _mode.record_shot(ring, _peek_focus)
 	_sm.trigger_fire(_last_result.ring, _last_result.total_points)
