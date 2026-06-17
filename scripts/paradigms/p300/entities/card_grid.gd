@@ -125,6 +125,20 @@ func reset_cards() -> void:
 		c.scale = Vector2.ONE
 
 
+func start_shuffle() -> void:
+	# 1. 翻到背面
+	for c in cards:
+		c.flip(false)
+	# 2. 延迟后换新牌翻到正面
+	get_tree().create_timer(0.8).timeout.connect(_do_new_deal)
+
+
+func _do_new_deal() -> void:
+	new_deal()
+	for c in cards:
+		c.flip(true)
+
+
 func new_deal() -> void:
 	# 随机抽取6张新牌
 	var pool := ["A♠", "K♥", "Q♦", "J♣", "10♠", "9♥", "8♦", "7♣", "6♠", "5♥", "4♦", "3♣"]

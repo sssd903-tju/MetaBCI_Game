@@ -78,7 +78,7 @@ func _on_think() -> void:
 		return
 	_target_idx = -1
 	_grid.reset_cards()
-	_grid.new_deal()
+	_grid.start_shuffle()
 	_hud.update_state("记住一张牌, 按 空格 开始")
 	_hud.update_round(_mode.current_round + 1)
 	_hud.hide_result()
@@ -96,7 +96,7 @@ func _on_scan_done() -> void:
 
 func _on_reveal(idx: int) -> void:
 	_grid.enlarge_card(idx)
-	var sym: String = CardGrid.SYMBOLS[idx]
+	var sym: String = _grid.cards[idx].symbol
 	_hud.update_state("系统猜测: %s" % sym)
 
 
