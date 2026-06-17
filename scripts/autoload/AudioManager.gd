@@ -76,10 +76,7 @@ func play_bow_shoot() -> void:
 
 func play_hit(ring: int) -> void:
 	if ring == 10:
-		# 先命中声，150ms 后十环叮声
 		_play_cached("hit", -3.0)
-		var timer := get_tree().create_timer(0.15)
-		timer.timeout.connect(func(): _play_cached("hit_10", 0.0))
 	else:
 		var player := _create_player()
 		player.stream = _sound_cache.get("hit", _gen_hit())

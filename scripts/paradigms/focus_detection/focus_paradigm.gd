@@ -140,8 +140,11 @@ func _on_scoring(_ring: int, _points: int) -> void:
 		AudioManager.play_miss()
 	else:
 		AudioManager.play_hit(ring)
-		if combo >= 2:
-			AudioManager.play_combo(combo)
+		var ding_count: int = combo
+		if ring == 10:
+			ding_count += 1  # 十环多叮一次
+		if ding_count >= 1:
+			AudioManager.play_combo(ding_count)
 
 
 func _on_finished(_final_score: int) -> void:
