@@ -129,6 +129,10 @@ func _on_finished(final_score: int) -> void:
 # --- 主循环 ---
 
 func _process(delta: float) -> void:
+	# 每帧同步专注度到准星和HUD（键盘模拟/BCI数据都覆盖）
+	_crosshair.focus_ratio = _current_focus
+	_hud.update_focus(_current_focus)
+
 	if _sm.current_state == ArcheryStateMachine.State.AIMING:
 		_hud.update_timer(_sm.get_aiming_progress())
 

@@ -18,6 +18,7 @@ var active := false
 var _target_center := Vector2.ZERO
 var _velocity := Vector2.ZERO
 var _jitter_offset := Vector2.ZERO
+var _jitter_target := Vector2.ZERO
 var _jitter_timer := 0.0
 
 
@@ -94,12 +95,15 @@ func _process(delta: float) -> void:
 
 func _update_jitter(delta: float, intensity: float) -> void:
 	_jitter_timer += delta
-	if _jitter_timer > 0.1:
+	if _jitter_timer > 0.15:
 		_jitter_timer = 0.0
-		_jitter_offset = Vector2(
+		# 目标抖动位置（随机方向）
+		_jitter_target = Vector2(
 			randf_range(-1.0, 1.0) * jitter_strength * intensity,
 			randf_range(-1.0, 1.0) * jitter_strength * intensity
 		)
+	# 平滑过渡到目标（避免跳动感）
+	_jitter_offset = _jitter_offset.lerp(_jitter_target, 5.0 * delta)
 
 
 ## 计算当前命中环数
