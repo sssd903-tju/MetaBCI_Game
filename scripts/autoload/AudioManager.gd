@@ -41,7 +41,7 @@ func _ready() -> void:
 
 func _load_external(name: String) -> AudioStream:
 	for ext in [".ogg", ".wav", ".mp3"]:
-		var path := AUDIO_DIR + "/" + name + ext
+		var path: String = AUDIO_DIR + "/" + name + ext
 		if ResourceLoader.exists(path):
 			var s: AudioStream = load(path)
 			if s:
@@ -62,7 +62,7 @@ func _gen_fallback(key: String) -> AudioStream:
 
 
 func _is_procedural(key: String) -> bool:
-	var s := _sound_cache.get(key)
+	var s: AudioStream = _sound_cache.get(key)
 	return s == null or s.get_class() == "AudioStreamWAV"
 
 
