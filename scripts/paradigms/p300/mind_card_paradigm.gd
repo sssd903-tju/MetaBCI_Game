@@ -77,6 +77,8 @@ func _on_think() -> void:
 		_sm.go_game_over()
 		return
 	_target_idx = -1
+	_grid.reset_cards()
+	_grid.new_deal()
 	_hud.update_state("记住一张牌, 按 空格 开始")
 	_hud.update_round(_mode.current_round + 1)
 	_hud.hide_result()

@@ -118,3 +118,17 @@ func hide_all() -> void:
 
 func enlarge_card(idx: int) -> void:
 	cards[idx].scale = Vector2.ONE * 1.3
+
+
+func reset_cards() -> void:
+	for c in cards:
+		c.scale = Vector2.ONE
+
+
+func new_deal() -> void:
+	# 随机抽取6张新牌
+	var pool := ["A♠", "K♥", "Q♦", "J♣", "10♠", "9♥", "8♦", "7♣", "6♠", "5♥", "4♦", "3♣"]
+	pool.shuffle()
+	for i in range(6):
+		cards[i].symbol = pool[i]
+		cards[i].flip(true)
