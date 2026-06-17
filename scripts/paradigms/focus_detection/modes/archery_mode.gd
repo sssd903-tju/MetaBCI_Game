@@ -7,7 +7,7 @@ var current_round := 0
 var round_scores: Array[int] = []
 var round_rings: Array[int] = []
 
-const TOTAL_ROUNDS := 10
+const TOTAL_ROUNDS := 5
 
 ## 优秀分数阈值
 const EXCELLENT_THRESHOLD := 80

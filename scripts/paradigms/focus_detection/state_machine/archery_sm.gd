@@ -23,7 +23,7 @@ const FIRED_TIME := 1.0
 const SCORING_TIME := 2.0
 
 # 总轮数
-const TOTAL_ROUNDS := 10
+const TOTAL_ROUNDS := 5
 var current_round := 0
 var total_score := 0
 var _pending_ring := 0

@@ -41,7 +41,7 @@ func _setup() -> void:
 	_timer_bg = ColorRect.new()
 	_timer_bg.color = GlobalConfig.PANEL_BORDER
 	_timer_bg.size = Vector2(300, 8)
-	_timer_bg.position = Vector2((GlobalConfig.GAME_WIDTH - 300) / 2.0, GlobalConfig.GAME_HEIGHT / 2.0 - 195)
+	_timer_bg.position = Vector2((GlobalConfig.GAME_WIDTH - 300) / 2.0, 145)
 	add_child(_timer_bg)
 
 	_timer_bar = ColorRect.new()
@@ -128,6 +128,19 @@ func hide_result() -> void:
 
 
 func show_final(total: int, rating: String) -> void:
+	_state_label.position = Vector2(0, 60)
 	_state_label.text = "游戏结束"
-	_result_label.text = "总分: %d  —  %s\n按 Enter 重新开始 | ESC 返回" % [total, rating]
+	_state_label.add_theme_font_size_override("font_size", 28)
+	_result_label.position = Vector2(0, 110)
+	_result_label.text = "总分: %d  —  %s" % [total, rating]
 	_result_label.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_PRIMARY)
+
+	var hint := Label.new()
+	hint.name = "FinalHint"
+	hint.text = "按 Enter 重新开始 | ESC 返回"
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.position = Vector2(0, 145)
+	hint.size = Vector2(GlobalConfig.GAME_WIDTH, 24)
+	hint.add_theme_font_size_override("font_size", 14)
+	hint.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_SECONDARY)
+	add_child(hint)
