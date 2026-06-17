@@ -65,6 +65,10 @@ func _setup_game() -> void:
 	_sm.finished.connect(_on_finished)
 	_grid.scan_finished.connect(_on_scan_done)
 
+	# 初始显示牌面 + 启动状态机
+	_grid.reveal_all()
+	_sm.enter_think()
+
 
 # --- 状态 ---
 
@@ -73,17 +77,13 @@ func _on_think() -> void:
 		_sm.go_game_over()
 		return
 	_target_idx = -1
-	_grid.hide_all()
 	_hud.update_state("记住一张牌, 按 空格 开始")
 	_hud.update_round(_mode.current_round + 1)
 	_hud.hide_result()
-	# 展示牌面
-	_grid.reveal_all()
 
 
 func _on_scan() -> void:
 	_hud.update_state("正在扫描脑电波... 保持注视!")
-	_grid.hide_all()
 	_grid.start_scan()
 
 
@@ -93,8 +93,6 @@ func _on_scan_done() -> void:
 
 
 func _on_reveal(idx: int) -> void:
-	# 放大猜测的牌
-	_grid.reveal_all()
 	_grid.enlarge_card(idx)
 	var sym: String = CardGrid.SYMBOLS[idx]
 	_hud.update_state("系统猜测: %s" % sym)

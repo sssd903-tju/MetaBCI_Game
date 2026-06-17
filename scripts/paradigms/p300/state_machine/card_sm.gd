@@ -18,6 +18,10 @@ const REVEAL_TIME := 1.5
 const CONFIRM_TIME := 3.0
 
 
+func _ready() -> void:
+	pass  # 不自动启动，由 paradigm 控制
+
+
 func enter_think() -> void:
 	change_state(State.THINK)
 	think_started.emit()
