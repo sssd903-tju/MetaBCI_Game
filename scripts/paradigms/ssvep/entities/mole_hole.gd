@@ -29,7 +29,7 @@ func _setup_mole_sprite() -> void:
 	var tex: Texture2D = load("res://assets/textures/mole.png")
 	if tex:
 		_mole_sprite.texture = tex
-		var target_w := hole_radius * 2.5
+		var target_w := hole_radius * 3.0
 		_base_scale = target_w / maxf(tex.get_width(), 1.0)
 		_mole_sprite.scale = Vector2.ONE * _base_scale
 		_shown_y = -tex.get_height() * _base_scale / 2.0 + hole_radius * 0.42
