@@ -125,7 +125,7 @@ func _process(delta: float) -> void:
 					_decoded_dir = ""
 
 			# 检查吃食物
-			if _snake.get_head() == _food.get_position():
+			if _snake.get_head() == _food.get_cell():
 				_snake.grow()
 				_snake.score += MindSnakeMode.FOOD_SCORE
 				_mode.ate_food()

@@ -26,7 +26,7 @@ func spawn(snake_body: Array[Vector2i]) -> void:
 	queue_redraw()
 
 
-func get_position() -> Vector2i:
+func get_cell() -> Vector2i:
 	return _position
 
 
