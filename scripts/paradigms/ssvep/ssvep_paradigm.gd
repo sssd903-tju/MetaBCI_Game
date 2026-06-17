@@ -79,26 +79,26 @@ func _on_state_changed(_old: WhackMoleStateMachine.State, _new: WhackMoleStateMa
 func _on_mole_shown(_hole_index: int) -> void:
 	var idx := _grid.spawn_mole()
 	_selected_hole = -1
-	_hud.update_state("地鼠出现！盯着闪烁的洞口")
+	_hud.update_state("地鼠冒头！盯着闪烁洞口")
 	_hud.hide_result()
 
 
 func _on_decode_start() -> void:
-	_hud.update_state("解码中 — 保持注视...")
+	_hud.update_state("正在识别 — 保持注视...")
 	_hud.show_timer(true)
 
 
 func _on_hit(hole_index: int) -> void:
 	var result := _mode.record_hit()
-	_hud.show_result("命中！ +%d" % result.points, GlobalConfig.UI_SUCCESS)
+	_hud.show_result("打到了！ +%d" % result.points, GlobalConfig.UI_SUCCESS)
 	_hud.update_combo(result.combo)
 	_update_hud()
-	AudioManager.play_hit(8)  # 复用命中音效
+	AudioManager.play_combo(1)
 
 
 func _on_miss() -> void:
 	var result := _mode.record_miss()
-	_hud.show_result("脱靶... ", GlobalConfig.UI_DANGER)
+	_hud.show_result("没打中...", GlobalConfig.UI_DANGER)
 	_hud.update_combo(0)
 	_update_hud()
 	AudioManager.play_miss()

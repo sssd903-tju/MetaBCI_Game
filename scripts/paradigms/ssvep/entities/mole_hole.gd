@@ -1,6 +1,6 @@
 extends Node2D
 class_name MoleHole
-## MoleHole — 单个洞口：闪烁环 + 贴图地鼠 + 洞口
+## MoleHole — 闪烁环 + 贴图地鼠 + 洞口
 
 @export var frequency: float = 10.0
 @export var flicker_color := Color.WHITE
@@ -12,6 +12,7 @@ var _mole_scale: float = 0.0
 var _flicker_brightness: float = 0.5
 var _label: Label
 var _mole_sprite: Sprite2D
+var _base_scale_x: float = 1.0
 
 
 func _ready() -> void:
@@ -23,14 +24,12 @@ func _ready() -> void:
 func _setup_mole_sprite() -> void:
 	_mole_sprite = Sprite2D.new()
 	_mole_sprite.name = "MoleSprite"
-	var tex := load("res://assets/textures/mole.png") as Texture2D
+	var tex: Texture2D = load("res://assets/textures/mole.png")
 	if tex:
 		_mole_sprite.texture = tex
-		# 缩放适配洞口
-		var target_w := hole_radius * 2.0
-		_mole_sprite.scale = Vector2.ONE * (target_w / maxf(tex.get_width(), 1.0))
-		# 锚点底部居中
-		_mole_sprite.offset = Vector2(0, -tex.get_height() * _mole_sprite.scale.y / 2.0)
+		var target_w := hole_radius * 2.8
+		_base_scale_x = target_w / maxf(tex.get_width(), 1.0)
+		_mole_sprite.scale = Vector2(_base_scale_x, 0)
 	_mole_sprite.position = Vector2(0, -hole_radius * 0.5)
 	_mole_sprite.visible = false
 	add_child(_mole_sprite)
@@ -52,13 +51,20 @@ func _process(delta: float) -> void:
 	_flicker_brightness = (sin(t * frequency * TAU) + 1.0) / 2.0
 
 	if mole_visible and _mole_scale < 1.0:
-		_mole_scale = minf(1.0, _mole_scale + delta * 4.0)
+		_mole_scale = minf(1.0, _mole_scale + delta * 5.0)
 	elif not mole_visible and _mole_scale > 0.0:
-		_mole_scale = maxf(0.0, _mole_scale - delta * 6.0)
+		_mole_scale = maxf(0.0, _mole_scale - delta * 7.0)
 
-	# 更新地鼠贴图
+	# 缓动: ease-out 弹出, ease-in 缩回
+	var eased: float
+	if mole_visible:
+		eased = 1.0 - pow(1.0 - _mole_scale, 3.0)  # ease-out cubic
+	else:
+		eased = pow(_mole_scale, 2.0)  # ease-in quadratic
+
 	_mole_sprite.visible = _mole_scale > 0.01
-	_mole_sprite.scale.y = absf(_mole_sprite.scale.x) * _mole_scale  # Y 方向弹出
+	_mole_sprite.scale = Vector2(_base_scale_x, _base_scale_x * eased)
+	_mole_sprite.modulate.a = clampf(eased * 1.3, 0.0, 1.0)
 
 	queue_redraw()
 
@@ -70,12 +76,9 @@ func _draw() -> void:
 	var ring_outer := hole_radius + ring_width
 	draw_circle(Vector2.ZERO, ring_outer, flicker_c)
 	draw_circle(Vector2.ZERO, hole_radius, GlobalConfig.BG_WARM_CREAM)
-
-	# 环线
 	draw_arc(Vector2.ZERO, hole_radius, 0, TAU, 32, Color.BLACK, 1.0)
 	draw_arc(Vector2.ZERO, ring_outer, 0, TAU, 32, Color.BLACK, 1.0)
-
-	# 洞口 (覆盖地鼠底部)
+	# 洞口
 	draw_circle(Vector2.ZERO, hole_radius - 4, Color("3A3028"))
 
 
