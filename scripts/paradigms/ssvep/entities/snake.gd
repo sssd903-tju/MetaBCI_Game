@@ -5,7 +5,7 @@ class_name MindSnake
 const CELL := 30
 const GRID_W := 36
 const GRID_H := 22
-const DIRS := {
+var dirs := {
 	"up":    Vector2i(0, -1),
 	"down":  Vector2i(0, 1),
 	"left":  Vector2i(-1, 0),
@@ -13,8 +13,8 @@ const DIRS := {
 }
 
 var body: Array[Vector2i] = []
-var direction: Vector2i = DIRS["right"]
-var next_direction: Vector2i = DIRS["right"]
+var direction: Vector2i = dirs["right"]
+var next_direction: Vector2i = dirs["right"]
 var _tick_timer: float = 0.0
 var _tick_interval: float = 0.3
 var _grow_pending: int = 0
@@ -35,8 +35,8 @@ func reset() -> void:
 	var cx := GRID_W / 2
 	var cy := GRID_H / 2
 	body = [Vector2i(cx, cy), Vector2i(cx - 1, cy), Vector2i(cx - 2, cy)]
-	direction = DIRS["right"]
-	next_direction = DIRS["right"]
+	direction = dirs["right"]
+	next_direction = dirs["right"]
 	_tick_interval = 0.3
 	_grow_pending = 0
 	alive = true
@@ -45,9 +45,9 @@ func reset() -> void:
 
 
 func set_direction(dir_name: String) -> void:
-	if not DIRS.has(dir_name):
+	if not dirs.has(dir_name):
 		return
-	var nd := DIRS[dir_name]
+	var nd := dirs[dir_name]
 	# 禁止反向
 	if nd == -direction:
 		return

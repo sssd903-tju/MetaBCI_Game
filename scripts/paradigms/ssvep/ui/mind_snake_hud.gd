@@ -54,7 +54,10 @@ func show_game_over(score: int, rating: String) -> void:
 	var s := StyleBoxFlat.new()
 	s.bg_color = GlobalConfig.PANEL_BG
 	s.border_color = GlobalConfig.UI_ACCENT
-	s.border_width_left = s.border_width_right = s.border_width_top = s.border_width_bottom = 2
+	s.border_width_left = 2
+	s.border_width_right = 2
+	s.border_width_top = 2
+	s.border_width_bottom = 2
 	s.corner_radius_top_left = s.corner_radius_top_right = s.corner_radius_bottom_left = s.corner_radius_bottom_right = 12
 	panel.add_theme_stylebox_override("panel", s)
 	add_child(panel)
