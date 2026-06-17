@@ -71,20 +71,20 @@ func _is_procedural(key: String) -> bool:
 # ============================================================
 
 func play_bow_shoot() -> void:
-	_play_cached("bow_shoot", -6.0)
+	_play_cached("bow_shoot", -3.0)
 
 
 func play_hit(ring: int) -> void:
 	if ring == 10:
 		# 先命中声，150ms 后十环叮声
-		_play_cached("hit", -6.0)
+		_play_cached("hit", -3.0)
 		var timer := get_tree().create_timer(0.15)
-		timer.timeout.connect(func(): _play_cached("hit_10", -3.0))
+		timer.timeout.connect(func(): _play_cached("hit_10", 0.0))
 	else:
 		var player := _create_player()
 		player.stream = _sound_cache.get("hit", _gen_hit())
 		player.pitch_scale = 0.7 + ring * 0.06
-		player.volume_db = -6.0
+		player.volume_db = -3.0
 		_add_and_play(player)
 
 
@@ -97,7 +97,7 @@ func play_combo(combo_count: int) -> void:
 	for i in range(combo_count):
 		var player := _create_player()
 		player.stream = _sound_cache.get("combo", _gen_combo())
-		player.volume_db = -6.0
+		player.volume_db = -3.0
 		add_child(player)
 		# 延迟播放
 		get_tree().create_timer(i * 0.12).timeout.connect(player.play)
@@ -110,7 +110,7 @@ func play_charge() -> void:
 	_charge_player = _create_player()
 	_charge_player.stream = _sound_cache["charge"]
 	_charge_player.pitch_scale = 0.5
-	_charge_player.volume_db = -8.0
+	_charge_player.volume_db = -10.0
 	_charge_player.finished.connect(_on_charge_loop_finished)
 	add_child(_charge_player)
 	_charge_player.play()
@@ -126,8 +126,8 @@ func update_charge(progress: float) -> void:
 		return
 	# 音高攀升 0.5→2.0: 模拟弓弦越拉越紧
 	_charge_player.pitch_scale = lerpf(0.5, 2.0, clampf(progress, 0.0, 1.0))
-	# 音量渐强 -8→-2dB
-	_charge_player.volume_db = lerpf(-8.0, -2.0, clampf(progress, 0.0, 1.0))
+	# 音量渐强 -10→-4dB
+	_charge_player.volume_db = lerpf(-10.0, -4.0, clampf(progress, 0.0, 1.0))
 
 
 func stop_charge() -> void:
