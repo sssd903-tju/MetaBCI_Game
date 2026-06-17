@@ -8,6 +8,9 @@ const SAMPLE_RATE := 44100.0
 # 缓存已生成的音效
 var _sound_cache: Dictionary = {}
 
+# 蓄力音效播放器引用
+var _charge_player: AudioStreamPlayer = null
+
 
 func _ready() -> void:
 	# 预生成内置音效
@@ -16,6 +19,7 @@ func _ready() -> void:
 	_sound_cache["hit"] = _gen_hit()
 	_sound_cache["miss"] = _gen_miss()
 	_sound_cache["combo"] = _gen_combo()
+	_sound_cache["charge"] = _gen_charge_loop()
 	print("[AudioManager] 音效就绪")
 
 
@@ -51,6 +55,39 @@ func play_combo(combo_count: int) -> void:
 	player.pitch_scale = 0.8 + combo_count * 0.15
 	player.volume_db = -4.0
 	_add_and_play(player)
+
+
+## 开始蓄力音效 (循环播放)
+func play_charge() -> void:
+	if _charge_player:
+		stop_charge()
+	_charge_player = _create_player()
+	_charge_player.stream = _sound_cache["charge"]
+	_charge_player.pitch_scale = 0.6
+	_charge_player.volume_db = -12.0
+	_charge_player.finished.connect(_on_charge_loop_finished)
+	add_child(_charge_player)
+	_charge_player.play()
+
+
+func _on_charge_loop_finished() -> void:
+	if _charge_player:
+		_charge_player.play()  # 重新播放实现循环
+
+
+## 更新蓄力音高 (progress: 0.0→1.0)
+func update_charge(progress: float) -> void:
+	if _charge_player:
+		_charge_player.pitch_scale = lerpf(0.6, 1.8, clampf(progress, 0.0, 1.0))
+		_charge_player.volume_db = lerpf(-12.0, -6.0, clampf(progress, 0.0, 1.0))
+
+
+## 停止蓄力音效
+func stop_charge() -> void:
+	if _charge_player:
+		_charge_player.stop()
+		_charge_player.queue_free()
+		_charge_player = null
 
 
 # --- 内部方法 ---
@@ -189,6 +226,33 @@ func _gen_rising_tone(duration: float, start_freq: float, end_freq: float) -> Au
 		var envelope := 1.0 - progress
 		var freq := lerpf(start_freq, end_freq, progress)
 		var value := sin(2.0 * PI * freq * t) * 0.2 * envelope
+		var sample16 := int(clampf(value, -1.0, 1.0) * 32767)
+		data.encode_s16(i * 2, sample16)
+
+	var stream := AudioStreamWAV.new()
+	stream.data = data
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(SAMPLE_RATE)
+	stream.stereo = false
+	return stream
+
+
+## 生成蓄力循环音 (低频嗡鸣 + 谐波)
+func _gen_charge_loop() -> AudioStreamWAV:
+	var duration := 1.0
+	var sample_count := int(SAMPLE_RATE * duration)
+	var data := PackedByteArray()
+	data.resize(sample_count * 2)
+
+	var base_freq := 120.0
+
+	for i in range(sample_count):
+		var t := float(i) / SAMPLE_RATE
+		var v1 := sin(2.0 * PI * base_freq * t) * 0.08
+		var v2 := sin(2.0 * PI * base_freq * 2.0 * t) * 0.04
+		var v3 := sin(2.0 * PI * base_freq * 3.0 * t) * 0.02
+		var tremolo := 1.0 + sin(2.0 * PI * 6.0 * t) * 0.15
+		var value := (v1 + v2 + v3) * tremolo
 		var sample16 := int(clampf(value, -1.0, 1.0) * 32767)
 		data.encode_s16(i * 2, sample16)
 

@@ -105,11 +105,13 @@ func _on_aiming_start() -> void:
 	_hud.update_state("瞄准中 — 保持专注！")
 	_hud.show_timer(true)
 	_peek_focus = _current_focus
+	AudioManager.play_charge()
 
 
 func _on_fired() -> void:
 	_crosshair.active = false
 	_hud.show_timer(false)
+	AudioManager.stop_charge()
 
 	# 记录射击时刻专注度 (取瞄准期间峰值)
 	if _current_focus > _peek_focus:
@@ -147,7 +149,9 @@ func _process(delta: float) -> void:
 	_hud.update_focus(_current_focus)
 
 	if _sm.current_state == ArcheryStateMachine.State.AIMING:
-		_hud.update_timer(_sm.get_aiming_progress())
+		var progress := _sm.get_aiming_progress()
+		_hud.update_timer(progress)
+		AudioManager.update_charge(progress)
 
 		# 检查瞄准是否到期，触发射箭
 		if _sm._state_timer <= 0.0 and _crosshair.active:
