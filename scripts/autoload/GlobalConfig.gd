@@ -9,7 +9,7 @@ extends Node
 # ============================================================
 
 # 背景色
-const BG_WARM_CREAM := Color("EFE9D8")      # 暖米色背景
+const BG_WARM_CREAM := Color("FAF6EE")      # 暖白色背景
 const BG_DARK := Color("3F4045")             # 深色背景 (备用)
 
 # 平台颜色
