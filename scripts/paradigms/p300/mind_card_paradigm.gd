@@ -122,7 +122,18 @@ func _on_finished() -> void:
 	_hud.show_final(s.total_score, s.correct, s.wrong, s.rating)
 
 
-# --- 键盘 ---
+# --- 主循环键盘检测 ---
+
+func _process(_delta: float) -> void:
+	if _sm.current_state == CardStateMachine.State.THINK:
+		if Input.is_action_just_pressed("ui_accept"):
+			_sm.enter_scan()
+	elif _sm.current_state == CardStateMachine.State.CONFIRM:
+		if Input.is_key_pressed(KEY_Y):
+			_sm.answer(true)
+		elif Input.is_key_pressed(KEY_N):
+			_sm.answer(false)
+
 
 func _input(event: InputEvent) -> void:
 	if _sm.current_state == CardStateMachine.State.GAME_OVER:
