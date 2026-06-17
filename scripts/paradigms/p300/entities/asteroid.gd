@@ -39,14 +39,20 @@ func _ready() -> void:
 	_value_label.add_theme_font_size_override("font_size", 14)
 	_value_label.add_theme_color_override("font_color", GlobalConfig.UI_TEXT_PRIMARY)
 	add_child(_value_label)
+	update_display()
 
 
 func setup(nm: String, icon: String, val: int) -> void:
 	ore_name = nm
 	ore_icon = icon
 	ore_value = val
-	_label.text = icon
-	_value_label.text = "%d pts" % val
+	update_display()
+
+func update_display() -> void:
+	if _label == null:
+		return
+	_label.text = ore_icon
+	_value_label.text = "%d pts" % ore_value
 
 
 func set_flash(on: bool) -> void:

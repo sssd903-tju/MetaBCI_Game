@@ -27,7 +27,6 @@ var _round_sequence: Array = []
 var _seq_pos: int = 0
 var _guessed_idx: int = -1
 var _ship: ColorRect
-var _ship_target: Vector2
 
 
 func _ready() -> void:
