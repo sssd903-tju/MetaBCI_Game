@@ -100,7 +100,7 @@ func _on_reveal(idx: int) -> void:
 	_hud.update_state("系统猜测: %s" % sym)
 
 
-func _on_confirm(idx: int) -> void:
+func _on_confirm(_idx: int) -> void:
 	_hud.update_state("猜对了吗? Y=是 / N=否")
 	_hud.show_confirm()
 
