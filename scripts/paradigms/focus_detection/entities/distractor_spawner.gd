@@ -73,7 +73,7 @@ func _spawn_one() -> void:
 	var speed := randf_range(40.0, 100.0)
 	var velocity := dir * speed
 
-	var color := DISTRACT_COLORS[randi() % DISTRACT_COLORS.size()]
+	var color: Color = DISTRACT_COLORS[randi() % DISTRACT_COLORS.size()]
 	var lifetime := randf_range(2.0, 5.0)
 
 	d.setup(radius, color, velocity, lifetime)
