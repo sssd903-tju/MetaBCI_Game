@@ -63,8 +63,8 @@ func play_charge() -> void:
 		stop_charge()
 	_charge_player = _create_player()
 	_charge_player.stream = _sound_cache["charge"]
-	_charge_player.pitch_scale = 0.7
-	_charge_player.volume_db = -14.0
+	_charge_player.pitch_scale = 0.6
+	_charge_player.volume_db = -18.0
 	_charge_player.finished.connect(_on_charge_loop_finished)
 	add_child(_charge_player)
 	_charge_player.play()
@@ -78,8 +78,8 @@ func _on_charge_loop_finished() -> void:
 ## 更新蓄力音高 (progress: 0.0→1.0)
 func update_charge(progress: float) -> void:
 	if _charge_player:
-		_charge_player.pitch_scale = lerpf(0.7, 1.5, clampf(progress, 0.0, 1.0))
-		_charge_player.volume_db = lerpf(-14.0, -8.0, clampf(progress, 0.0, 1.0))
+		_charge_player.pitch_scale = lerpf(0.6, 1.4, clampf(progress, 0.0, 1.0))
+		_charge_player.volume_db = lerpf(-18.0, -10.0, clampf(progress, 0.0, 1.0))
 
 
 ## 停止蓄力音效
@@ -237,37 +237,42 @@ func _gen_rising_tone(duration: float, start_freq: float, end_freq: float) -> Au
 	return stream
 
 
-## 生成蓄力循环音 (弓弦拉紧 — 弦振 + 摩擦质感)
+## 生成蓄力循环音 (弓弦摩擦 — 不规则嘎吱声，无持续音)
 func _gen_charge_loop() -> AudioStreamWAV:
-	var duration := 0.8
+	var duration := 0.5
 	var sample_count := int(SAMPLE_RATE * duration)
 	var data := PackedByteArray()
 	data.resize(sample_count * 2)
 
-	var base_freq := 320.0  # 中等音高，弦乐感
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 42
+
+	# 预计算摩擦事件 (时间, 强度, 持续帧数)
+	var creaks: Array[Dictionary] = []
+	var t := 0.0
+	while t < duration:
+		creaks.append({
+			"start": t,
+			"duration": rng.randf_range(0.003, 0.015),
+			"amp": rng.randf_range(0.15, 0.35),
+		})
+		t += rng.randf_range(0.02, 0.08)  # 不规则间隔
 
 	for i in range(sample_count):
-		var t := float(i) / SAMPLE_RATE
-		var progress := float(i) / float(sample_count)
+		var now := float(i) / SAMPLE_RATE
+		var value := 0.0
 
-		# 弦振动 — 仅奇次谐波，无基频（弓弦质感）
-		var string_tone := sin(2.0 * PI * base_freq * 3.0 * t) * 0.04   # 3次谐波
-		string_tone += sin(2.0 * PI * base_freq * 5.0 * t) * 0.02        # 5次谐波
+		# 检查是否在摩擦事件中
+		for c in creaks:
+			var elapsed := now - c.start
+			if elapsed >= 0 and elapsed < c.duration:
+				# 摩擦噪声 — 带通滤波模拟 (简单粗暴: 白噪 × 衰减包络)
+				var env := 1.0 - (elapsed / c.duration)
+				value += randf_range(-1.0, 1.0) * c.amp * env
+				break
 
-		# 细微频率滑动 (模拟弓弦逐渐拉紧)
-		var sweep := 1.0 + progress * 0.15
-		string_tone *= sweep
-
-		# 弓毛摩擦声 — 过滤噪声短脉冲
-		var creak := 0.0
-		if i % int(SAMPLE_RATE * 0.06) < int(SAMPLE_RATE * 0.008):  # 每60ms一小段噪声
-			creak = randf_range(-0.04, 0.04)
-
-		# 轻微不协和拍频 (两根弦的微小频率差产生紧张感)
-		var beat := sin(2.0 * PI * (base_freq + 3.5) * t) * 0.02
-
-		var value := string_tone + creak + beat
-		value *= 0.7  # 总体音量
+		# 极轻微的底噪 (弓毛持续接触感)
+		value += randf_range(-0.01, 0.01)
 
 		var sample16 := int(clampf(value, -1.0, 1.0) * 32767)
 		data.encode_s16(i * 2, sample16)
