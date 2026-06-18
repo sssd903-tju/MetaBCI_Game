@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/paradigms/focus_detection/focus_hub.gd" id="1_h"]
+
+[node name="FocusHub" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+script = ExtResource("1_h")
