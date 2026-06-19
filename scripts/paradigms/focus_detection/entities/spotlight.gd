@@ -5,8 +5,8 @@ class_name Spotlight
 var focus_ratio: float = 1.5
 var _radius: float = 150.0
 
-const BASE_RADIUS := 120.0
-const FOCUS_SCALE := 80.0   # 满专注额外 80px 半径
+const BASE_RADIUS := 80.0
+const FOCUS_SCALE := 50.0   # 满专注额外 50px 半径
 
 
 func _ready() -> void:
