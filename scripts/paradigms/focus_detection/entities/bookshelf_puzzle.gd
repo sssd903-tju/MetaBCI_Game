@@ -40,18 +40,19 @@ func _ready() -> void:
 
 func setup(spot: Spotlight) -> void:
 	_spotlight = spot
-	# 随机选缺失数字
-	var missing_idx := randi_range(1, 7)  # 避开头尾
+	# 随机选缺失数字 (从第2到第8个中选, 避开1和9作为首尾)
+	var missing_idx := randi_range(2, 7)
 	missing_digit = BOOK_NUMBERS[missing_idx]
 
-	# 显示除缺失外的5本连续书
-	var start := maxi(1, missing_idx - 2)
-	if start + 4 > 9:
-		start = 5
-	var shown := BOOK_NUMBERS.slice(start, start + 5)
+	# 显示缺失数字周围的5本书
+	var start := missing_idx - 2
+	var shown: Array = []
+	for j in range(5):
+		if start + j < BOOK_NUMBERS.size():
+			shown.append(BOOK_NUMBERS[start + j])
 
 	var gap := 55.0
-	for i in range(5):
+	for i in range(shown.size()):
 		var lbl := Label.new()
 		lbl.text = "📕 %d" % shown[i]
 		lbl.add_theme_font_size_override("font_size", 16)

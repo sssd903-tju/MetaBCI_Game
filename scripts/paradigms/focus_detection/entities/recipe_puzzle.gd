@@ -5,6 +5,7 @@ class_name RecipePuzzle
 var digit1: int = 0
 var digit2: int = 0
 var solved: bool = false
+@warning_ignore("unused_private_class_variable")
 var _focus_time: float = 0.0
 var _spotlight: Spotlight = null
 var _label: Label
