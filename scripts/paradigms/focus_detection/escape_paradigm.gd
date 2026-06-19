@@ -1,5 +1,5 @@
 extends BaseParadigm
-## EscapeParadigm — 密室逃脱: 顺序解锁 + 线索收集
+## EscapeParadigm — 密室逃脱: 门锁谜题 + 线索谜题
 
 var _spotlight: Spotlight
 var _rooms: RoomManager
@@ -10,6 +10,9 @@ var _hud: EscapeHUD
 var _safe: SafePuzzle
 var _bookshelf: BookshelfPuzzle
 var _recipe: RecipePuzzle
+
+# 门锁小谜题
+var _door_locks: Array[DoorLock] = []
 
 var _story_phase: int = 0
 var _code_digits: Array = [0, 0, 0, 0]
@@ -28,12 +31,10 @@ func _on_paradigm_start() -> void:
 	_setup_room()
 	_setup_game()
 	_mode.start_new(4)
-	_story_phase = 0
-	_solved_count = 0
+	_story_phase = 0; _solved_count = 0
 	_code_digits = [0, 0, 0, 0]
-	_room_cooldown = 0.0
-	_keyboard_focus = false
-	_clues_found.clear()
+	_room_cooldown = 0.0; _keyboard_focus = false
+	_clues_found.clear(); _door_locks.clear()
 	_play_intro()
 
 
@@ -51,12 +52,12 @@ func _on_bci_data(data: Dictionary) -> void:
 
 func _play_intro() -> void:
 	_hud.show_narrative("")
-	_narrate("黑暗中，你摸索着坐起来。", 2.0, func():
-		_narrate("指尖触到一张揉皱的纸。", 1.5, func():
-			_narrate("「如果你读到这个——\n你已经接受了试炼。」\n「每个房间都锁着通往记忆的门。」\n「解开谜题，门就会开。」\n「线索散落四处，\n全部找到才能逃脱。」\n—— X", 5.0, func():
+	_narrate("你在黑暗中醒来。什么都看不见。", 2.0, func():
+		_narrate("等等——你的手中握着一张字条:", 1.5, func():
+			_narrate("「欢迎，访客。」\n「每个房间的门都锁着。」\n「找到门锁，用光照亮它——」\n「光会打开通往下一个房间的路。」\n「每个房间还藏着一个数字。」\n「集齐它们，输入客厅的键盘。」\n「卧室的门会打开。你会记起一切。」\n—— X", 6.0, func():
 				_story_phase = 1
 				_hud.update_layer(0)
-				_hud.update_info("谜题: 0/3  线索: 0/3  在客厅找保险箱")
+				_hud.update_info("先找到门锁→照亮它!  谜题:0/3  线索:0/3")
 			)
 		)
 	)
@@ -92,31 +93,37 @@ func _setup_game() -> void:
 	_spotlight.position = Vector2(GlobalConfig.GAME_WIDTH * 0.3, GlobalConfig.GAME_HEIGHT * 0.5)
 	add_child(_spotlight)
 
-	# 保险箱 (客厅)
+	# ---- 门锁小谜题 (每个需要解锁的门) ----
+	_add_door_lock(Vector2(GlobalConfig.GAME_WIDTH - 160, GlobalConfig.GAME_HEIGHT/2 - 30),
+		"书房", "living_study", RoomManager.Room.LIVING, "照亮门锁→打开书房")
+	_add_door_lock(Vector2(GlobalConfig.GAME_WIDTH/2 - 70, GlobalConfig.GAME_HEIGHT - 70),
+		"厨房", "living_kitchen", RoomManager.Room.LIVING, "照亮门锁→打开厨房")
+	_add_door_lock(Vector2(GlobalConfig.GAME_WIDTH/2 - 70, GlobalConfig.GAME_HEIGHT - 70),
+		"卧室", "study_bedroom", RoomManager.Room.STUDY, "照亮门锁→打开卧室")
+	_add_door_lock(Vector2(GlobalConfig.GAME_WIDTH - 160, GlobalConfig.GAME_HEIGHT/2 - 30),
+		"卧室", "kitchen_bedroom", RoomManager.Room.KITCHEN, "照亮门锁→打开卧室")
+
+	# ---- 线索谜题 ----
 	_safe = SafePuzzle.new()
-	_safe.position = Vector2(GlobalConfig.GAME_WIDTH * 0.25, GlobalConfig.GAME_HEIGHT * 0.55)
+	_safe.position = Vector2(GlobalConfig.GAME_WIDTH * 0.2, GlobalConfig.GAME_HEIGHT * 0.55)
 	_safe.setup(4, 7, _spotlight)
 	add_child(_safe)
 
-	# 书架 (书房)
 	_bookshelf = BookshelfPuzzle.new()
-	_bookshelf.position = Vector2(GlobalConfig.GAME_WIDTH * 0.5, GlobalConfig.GAME_HEIGHT * 0.4)
+	_bookshelf.position = Vector2(GlobalConfig.GAME_WIDTH * 0.55, GlobalConfig.GAME_HEIGHT * 0.35)
 	_bookshelf.setup(_spotlight)
 	add_child(_bookshelf)
 
-	# 食谱 (厨房)
 	_recipe = RecipePuzzle.new()
 	_recipe.position = Vector2(GlobalConfig.GAME_WIDTH * 0.35, GlobalConfig.GAME_HEIGHT * 0.3)
 	_recipe.setup(_spotlight)
 	add_child(_recipe)
 
-	# 键盘 (客厅)
 	_keypad = EscapeKeypad.new()
 	_keypad.set_spotlight(_spotlight)
-	_keypad.position = Vector2(GlobalConfig.GAME_WIDTH * 0.25, GlobalConfig.GAME_HEIGHT * 0.2)
+	_keypad.position = Vector2(GlobalConfig.GAME_WIDTH * 0.2, GlobalConfig.GAME_HEIGHT * 0.15)
 	add_child(_keypad)
 
-	# 出口 (卧室)
 	_door = ExitDoor.new()
 	_door.door_escaped.connect(_on_escaped)
 	_door.position = Vector2(GlobalConfig.GAME_WIDTH - 240, (GlobalConfig.GAME_HEIGHT - 300) / 2.0)
@@ -132,6 +139,15 @@ func _setup_game() -> void:
 	_update_visibility()
 
 
+func _add_door_lock(pos: Vector2, label: String, key: String, room: int, _hint: String) -> void:
+	var dl := DoorLock.new()
+	dl.position = pos
+	dl.setup(label, key, _spotlight)
+	dl.visible = false
+	add_child(dl)
+	_door_locks.append({"node": dl, "room": room})
+
+
 func _update_visibility() -> void:
 	var cr := _rooms.current_room
 	_safe.visible = (cr == RoomManager.Room.LIVING)
@@ -140,43 +156,54 @@ func _update_visibility() -> void:
 	_keypad.visible = (cr == RoomManager.Room.LIVING)
 	_door.visible = (cr == RoomManager.Room.BEDROOM)
 
+	for entry: Dictionary in _door_locks:
+		var d: DoorLock = entry.node
+		d.visible = (entry.room == cr and not d.unlocked)
+
 
 func _on_room_changed(_from: int, to: int) -> void:
 	_update_visibility()
 	var rn := _rooms.get_room_name(to)
 	_hud.show_narrative("—— %s ——" % rn)
 	get_tree().create_timer(1.0).timeout.connect(func():
-		if _story_phase >= 1:
-			_hud.show_narrative("")
+		if _story_phase >= 1: _hud.show_narrative("")
 	)
 
 
 # ============================================================
-# 谜题 → 解锁门
+# 门锁回调
+# ============================================================
+
+func on_door_unlocked(key: String) -> void:
+	_rooms.unlock_door(key)
+	_hud.show_narrative("门开了!")
+	get_tree().create_timer(1.5).timeout.connect(func():
+		if _story_phase >= 1: _hud.show_narrative("")
+	)
+	_update_visibility()
+
+
+# ============================================================
+# 线索谜题回调
 # ============================================================
 
 func on_safe_solved() -> void:
 	_code_digits[0] = _safe.digit1
 	_code_digits[1] = _safe.digit2
-	_add_clue("客厅线索: 「她最后一次出现在书房」")
-	_rooms.unlock_door("living_study")
-	_solved(1, "书房的门开了。去看看。")
+	_add_clue("客厅线索: 「她的名字里有四个数字」")
+	_puzzle_solved("保险箱划痕: %d 和 %d" % [_safe.digit1, _safe.digit2])
 
 func on_bookshelf_solved() -> void:
 	_code_digits[2] = _bookshelf.missing_digit
-	_add_clue("书房线索: 「食谱里有重要的数字」")
-	_rooms.unlock_door("study_bedroom")
-	# 也解锁 书房→厨房 (通过客厅绕)
-	_rooms.unlock_door("living_kitchen")
-	_solved(2, "厨房和卧室的门可以通行了。")
+	_add_clue("书房线索: 「其中藏着命运的密码」")
+	_puzzle_solved("缺失编号: %d" % _bookshelf.missing_digit)
 
 func _on_recipe_read() -> void:
 	if _recipe.solved: return
 	_recipe.mark_solved()
 	_code_digits[3] = _recipe.digit1
-	_add_clue("厨房线索: 「所有数字都在字条背面」")
-	_rooms.unlock_door("kitchen_bedroom")
-	_solved(3, "最后一个门也开了。密码已完整。")
+	_add_clue("厨房线索: 「四重锁，四段记忆」")
+	_puzzle_solved("食谱主料: %dg" % _recipe.digit1)
 
 
 func _add_clue(clue: String) -> void:
@@ -184,68 +211,57 @@ func _add_clue(clue: String) -> void:
 		_clues_found.append(clue)
 
 
-func _solved(n: int, msg: String) -> void:
-	_solved_count = n
+func _puzzle_solved(msg: String) -> void:
+	_solved_count += 1
 	_hud.show_narrative(msg)
 	AudioManager.play_hit(8)
-
 	var progress := ""
 	for i in range(4):
 		progress += str(_code_digits[i]) if _code_digits[i] > 0 else "_"
-	_hud.update_info("谜题: %d/3  线索: %d/3  密码: %s" % [_solved_count, _clues_found.size(), progress])
-
-	get_tree().create_timer(2.5).timeout.connect(func():
+	_hud.update_info("谜题:%d/3  线索:%d/3  密码:%s" % [_solved_count, _clues_found.size(), progress])
+	get_tree().create_timer(2.0).timeout.connect(func():
 		_hud.show_narrative("")
-		if _solved_count >= 3:
-			_ready_to_escape()
+		if _solved_count >= 3: _ready_to_escape()
 	)
 
 
 func _ready_to_escape() -> void:
 	var code := ""
-	for d in _code_digits:
-		code += str(d)
-	_story_phase = 2
+	for d in _code_digits: code += str(d)
 	_mode.code = code
 	_hud.update_layer(1)
 	_hud.update_info("密码: %s  回客厅输入!" % code)
-	_narrate("三个谜题已破。\n密码是 %s。\n回到客厅，输入键盘。" % code, 3.0, func():
+	_narrate("密码已完整: %s。回客厅吧。" % code, 2.5, func():
 		_hud.show_narrative("")
 		_keypad.show_for_code(code)
 	)
 
 
 # ============================================================
-# 解锁 → 逃脱
+# 逃脱
 # ============================================================
 
 func on_keypad_unlocked() -> void:
 	_hud.update_layer(2)
 	_hud.update_info("去卧室! 光照门锁按 Enter")
-	_narrate("绿灯亮了。卧室传来门锁弹开的声音——", 2.0, func():
+	_narrate("绿灯。远处传来门锁弹开的声音。", 2.0, func():
 		_hud.show_narrative("")
 		_door.activate(_spotlight)
 	)
 
 
 func _on_escaped() -> void:
-	_mode.escape()
-	var score := _mode.get_score()
-	var rating := _mode.get_rating()
-	var all_clues := ""
-	for c in _clues_found:
-		all_clues += c + "\n"
-	_narrate("门开了。你看到了镜子里的自己。\n" + all_clues + "\n「你终于走到这一步。」\n「记住——谜题从来不在房间里。」\n「而是在你心里。」", 5.0, func():
-		_hud.update_layer(3)
-		_hud.show_escaped(score, rating)
-		_hud.show_narrative("")
+	_mode.escape(); var score := _mode.get_score(); var rating := _mode.get_rating()
+	var all := ""
+	for c in _clues_found: all += c + "\n"
+	_narrate("门开了。光涌进来。\n\n" + all + "\n你终于想起来了——\n谜题从来不在房间里。\n它们是你自己锁住的记忆。", 5.0, func():
+		_hud.update_layer(3); _hud.show_escaped(score, rating); _hud.show_narrative("")
 	)
-	_spotlight.focus_ratio = 0
-	AudioManager.play_hit(10)
+	_spotlight.focus_ratio = 0; AudioManager.play_hit(10)
 
 
 # ============================================================
-# 主循环
+# 主循环 / 键盘
 # ============================================================
 
 func _process(delta: float) -> void:
@@ -266,18 +282,12 @@ func _process(delta: float) -> void:
 			_room_cooldown = 0.5
 			_spotlight.position = _rooms.transition_to(t)
 
-	# 食谱自动读取
 	if not _recipe.solved and _rooms.current_room == RoomManager.Room.KITCHEN and _spotlight:
 		var rc := _recipe.global_position + _recipe.size / 2.0
 		if rc.distance_to(_spotlight.global_position) < _spotlight.get_radius() * 0.5:
 			_recipe._focus_time += delta
-			if _recipe._focus_time >= 2.0:
-				_on_recipe_read()
+			if _recipe._focus_time >= 2.0: _on_recipe_read()
 
-
-# ============================================================
-# 键盘
-# ============================================================
 
 func _input(event: InputEvent) -> void:
 	if _mode.current_layer == EscapeMode.Layer.DONE:
@@ -298,5 +308,5 @@ func _restart() -> void:
 	for child in get_children():
 		if child.name != "Background": child.queue_free()
 	_keyboard_focus = false; _story_phase = 0; _solved_count = 0
-	_code_digits = [0, 0, 0, 0]; _clues_found.clear()
+	_code_digits = [0, 0, 0, 0]; _clues_found.clear(); _door_locks.clear()
 	await get_tree().process_frame; _on_paradigm_start()
