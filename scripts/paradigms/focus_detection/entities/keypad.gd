@@ -5,7 +5,7 @@ class_name EscapeKeypad
 var target_code: String = ""
 var entered: String = ""
 var unlocked: bool = false
-var visible: bool = false
+var is_active: bool = false
 var _spotlight: Spotlight = null
 var _buttons: Array[Button] = []
 var _display: Label
@@ -40,7 +40,7 @@ func _ready() -> void:
 
 	for row in range(4):
 		for col in range(3):
-			var val := layout[row][col]
+			var val: int = layout[row][col]
 			var btn := Button.new()
 			btn.size = btn_size
 			btn.position = Vector2(start_x + col * 85, start_y + row * 65)
@@ -57,7 +57,7 @@ func _ready() -> void:
 			_buttons.append(btn)
 
 	modulate.a = 0.0
-	visible = false
+	hide()
 
 
 func set_spotlight(s: Spotlight) -> void:
@@ -69,11 +69,12 @@ func show_for_code(code: String) -> void:
 	entered = ""
 	unlocked = false
 	_display.text = "____"
-	visible = true
+	is_active = true
+	show()
 
 
 func _process(_delta: float) -> void:
-	if not visible or unlocked:
+	if not is_active or unlocked:
 		return
 
 	# 光照可见性: 越近越亮
