@@ -7,6 +7,7 @@ var timer_label: Label
 var focus_bar: ColorRect
 var focus_bg: ColorRect
 var hint_label: Label
+var narrate_label: Label
 
 
 func _ready() -> void:
@@ -76,5 +77,21 @@ func update_focus(ratio: float) -> void:
 	focus_bar.color = GlobalConfig.focus_to_color(ratio)
 
 
+func show_narrative(text: String) -> void:
+	if narrate_label == null:
+		narrate_label = _lbl("", 17, Color("C0B090"))
+		narrate_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		narrate_label.position = Vector2(0, GlobalConfig.GAME_HEIGHT / 2.0 - 80)
+		narrate_label.size = Vector2(GlobalConfig.GAME_WIDTH, 120)
+		add_child(narrate_label)
+	narrate_label.text = text
+
+
+func show_narrative_room(room: String, icon: String, text: String) -> void:
+	show_narrative("[%s %s]\n%s" % [icon, room, text])
+
+
 func show_escaped(score: int, rating: String) -> void:
+	show_narrative("")
 	info_label.text = "得分: %d — %s  |  Enter 再来 | ESC 返回" % [score, rating]
+

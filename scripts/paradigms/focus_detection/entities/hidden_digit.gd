@@ -4,7 +4,7 @@ class_name HiddenDigit
 
 @export var digit: int = 1
 @export var index: int = 0
-
+var clue_text: String = ""
 var found: bool = false
 var _label: Label
 var _spotlight: Spotlight = null
