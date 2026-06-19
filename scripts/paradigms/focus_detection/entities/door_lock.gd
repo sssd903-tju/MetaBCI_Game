@@ -11,6 +11,7 @@ var _label: Label
 var _progress: ColorRect
 var _bg: ColorRect
 var _lock_icon: Label
+var _pending_setup: bool = false
 
 
 func _ready() -> void:
@@ -45,12 +46,23 @@ func _ready() -> void:
 
 	modulate.a = 0.0
 
+	if _pending_setup:
+		_apply_setup()
+
 
 func setup(label: String, key: String, spot: Spotlight) -> void:
 	door_label = label
 	door_key = key
 	_spotlight = spot
-	_label.text = "通往\n" + label
+	if _label:
+		_apply_setup()
+	else:
+		_pending_setup = true
+
+
+func _apply_setup() -> void:
+	_pending_setup = false
+	_label.text = "通往\n" + door_label
 
 
 func _process(delta: float) -> void:
