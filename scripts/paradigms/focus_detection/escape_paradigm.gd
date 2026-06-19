@@ -12,7 +12,7 @@ var _bookshelf: BookshelfPuzzle
 var _recipe: RecipePuzzle
 
 # 门锁小谜题
-var _door_locks: Array[DoorLock] = []
+var _door_locks: Array = []
 
 var _story_phase: int = 0
 var _code_digits: Array = [0, 0, 0, 0]
