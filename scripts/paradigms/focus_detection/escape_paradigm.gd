@@ -1,15 +1,22 @@
 extends BaseParadigm
-## EscapeParadigm — 密室逃脱: 剧情驱动
+## EscapeParadigm — 密室逃脱: 4种解谜 + 剧情驱动
 
 var _spotlight: Spotlight
-var _digits: Array[HiddenDigit] = []
+var _map: RoomMap
 var _keypad: EscapeKeypad
 var _door: ExitDoor
-var _map: RoomMap
 var _mode: EscapeMode
 var _hud: EscapeHUD
+
+# 谜题
+var _clock: ClockPuzzle
+var _bookshelf: BookshelfPuzzle
+var _recipe: RecipePuzzle
+
 var _keyboard_focus: bool = false
 var _story_phase: int = 0
+var _code_digits: Array = [0, 0, 0, 0]
+var _solved_count: int = 0
 
 
 func _ready() -> void:
@@ -22,17 +29,9 @@ func _on_paradigm_start() -> void:
 	_setup_game()
 	_mode.start_new(4)
 	_story_phase = 0
-	_narrate("你在一间漆黑的屋子里醒来...", 2.0, func():
-		_narrate("头痛欲裂, 什么都不记得了", 2.0, func():
-			_narrate("桌上有一张纸条:", 1.5, func():
-				_narrate_room("客厅", "🛋", "欢迎。我是X。\n找到藏在书房和厨房的4个数字密码。\n输入客厅的键盘。\n卧室的门会为你打开。\n—— 你只有时间, 没有退路", 3.0, func():
-					_story_phase = 1
-					_hud.update_layer(0)
-					_hud.update_info("探索书房和厨房, 找到 4 个隐藏数字")
-				)
-			)
-		)
-	)
+	_solved_count = 0
+	_code_digits = [0, 0, 0, 0]
+	_play_intro()
 
 
 func _on_paradigm_end() -> void:
@@ -43,16 +42,25 @@ func _on_bci_data(data: Dictionary) -> void:
 	_spotlight.focus_ratio = data.get("ratio", 1.5)
 
 
-# --- 叙事 ---
+# --- 剧情 ---
 
-func _narrate(text: String, duration: float, callback: Callable) -> void:
+func _play_intro() -> void:
+	_narrate("头痛欲裂…\n你在黑暗中睁开眼。", 2.5, func():
+		_narrate("陌生的房间。冰冷的空气。", 2.0, func():
+			_narrate("桌上压着一张字条，墨迹未干:", 2.0, func():
+				_narrate("「你只有一条命，一间密室，\n和三个谜题。破解它们，\n密码自现。出门之后，\n你会知道我是谁。」\n—— X", 4.0, func():
+					_hud.update_layer(0)
+					_hud.update_info("探索房间, 破解谜题, 收集密码")
+					_story_phase = 1
+				)
+			)
+		)
+	)
+
+
+func _narrate(text: String, dur: float, cb: Callable) -> void:
 	_hud.show_narrative(text)
-	get_tree().create_timer(duration).timeout.connect(callback)
-
-
-func _narrate_room(room: String, icon: String, text: String, duration: float, callback: Callable) -> void:
-	_hud.show_narrative_room(room, icon, text)
-	get_tree().create_timer(duration).timeout.connect(callback)
+	get_tree().create_timer(dur).timeout.connect(cb)
 
 
 # --- 场景 ---
@@ -77,30 +85,35 @@ func _setup_game() -> void:
 	_spotlight.position = _map.get_room_center(0)
 	add_child(_spotlight)
 
-	# 隐藏数字: 书房和厨房各2个, 每个有剧情文本
-	var digit_clues := [
-		{"room": 1, "clue": "书架上掉下一本书...\n第 7 页画着圈"},
-		{"room": 1, "clue": "书桌抽屉里刻着一行字:\n'她最爱第 3 个季节'"},
-		{"room": 2, "clue": "冰箱贴下面压着纸条:\n'买 5 个鸡蛋'"},
-		{"room": 2, "clue": "橱柜门内侧写着:\n密码之一是 9"},
-	]
-	for i in range(4):
-		var d := HiddenDigit.new()
-		d.name = "Digit%d" % i
-		d.index = i
-		d.digit = [7, 3, 5, 9][i]  # 固定密码 7359
-		d.position = _map.get_random_pos_in_room(digit_clues[i].room)
-		d.clue_text = digit_clues[i].clue
-		d.set_spotlight(_spotlight)
-		add_child(d)
-		_digits.append(d)
+	# 客厅: 挂钟谜题 (2位)
+	_clock = ClockPuzzle.new()
+	_clock.name = "Clock"
+	_clock.position = _map.get_room_center(0) - Vector2(90, 100)
+	_clock.setup(7, 3, _spotlight)  # 7:30 → digits 7,3
+	add_child(_clock)
 
+	# 书房: 书架谜题 (1位)
+	_bookshelf = BookshelfPuzzle.new()
+	_bookshelf.name = "Bookshelf"
+	_bookshelf.position = _map.get_room_center(1) - Vector2(200, 60)
+	_bookshelf.setup(_spotlight)
+	add_child(_bookshelf)
+
+	# 厨房: 食谱谜题 (1位)
+	_recipe = RecipePuzzle.new()
+	_recipe.name = "Recipe"
+	_recipe.position = _map.get_room_center(2) - Vector2(160, 80)
+	_recipe.setup(_spotlight)
+	add_child(_recipe)
+
+	# 客厅: 密码键盘
 	_keypad = EscapeKeypad.new()
 	_keypad.name = "Keypad"
 	_keypad.set_spotlight(_spotlight)
-	_keypad.position = Vector2(100, 150)
+	_keypad.position = Vector2(100, 200)
 	add_child(_keypad)
 
+	# 卧室: 出口门
 	_door = ExitDoor.new()
 	_door.name = "ExitDoor"
 	_door.door_escaped.connect(_on_escaped)
@@ -108,54 +121,70 @@ func _setup_game() -> void:
 	add_child(_door)
 
 	_mode = EscapeMode.new()
-	# 固定密码
-	_mode.code = "7359"
 
 	_hud = EscapeHUD.new()
 	_hud.name = "HUD"
 	_hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_hud)
-
 	_hud.show_narrative("")
 
 
-# --- 数字被发现 ---
+# --- 谜题回调 ---
 
-func on_digit_found(index: int) -> void:
-	if _story_phase < 1:
+func on_clock_solved() -> void:
+	_code_digits[0] = _clock.hour_digit
+	_code_digits[1] = _clock.min_digit
+	_on_puzzle_solved("挂钟指针指向 %d:%d0" % [_clock.hour_digit, _clock.min_digit])
+
+
+func on_bookshelf_solved() -> void:
+	_code_digits[2] = _bookshelf.missing_digit
+	_on_puzzle_solved("缺失的编号是 %d" % _bookshelf.missing_digit)
+
+
+func _on_recipe_read() -> void:
+	if _recipe.solved:
 		return
+	_recipe.mark_solved()
+	_code_digits[3] = _recipe.digit1
+	_on_puzzle_solved("食谱主料: %dg" % _recipe.digit1)
 
-	var clue := ""
-	if index < _digits.size():
-		clue = _digits[index].clue_text
 
-	_mode.digit_found()
-	_hud.update_info("已发现: %d / 4   %s" % [_mode.found_digits, ["", "▮", "▮▮", "▮▮▮", "▮▮▮▮"][_mode.found_digits]])
-	AudioManager.play_combo(1)
+func _on_puzzle_solved(msg: String) -> void:
+	_solved_count += 1
+	_hud.show_narrative(msg)
+	AudioManager.play_hit(8)
 
-	# 显示线索
-	if clue != "":
-		_hud.show_narrative(clue)
-		get_tree().create_timer(2.0).timeout.connect(func():
-			if _mode.current_layer == EscapeMode.Layer.FIND_CODE:
-				_hud.show_narrative("")
-		)
+	var progress := ""
+	for i in range(4):
+		progress += str(_code_digits[i]) if _code_digits[i] > 0 else "_"
+	_hud.update_info("密码: %s   谜题: %d/3" % [progress, _solved_count])
 
-	if _mode.found_digits >= _mode.total_digits:
-		AudioManager.play_hit(8)
-		_hud.update_layer(1)
-		_hud.update_info("密码已全部找到! 去客厅输入键盘")
-		_narrate("四位数都找到了...\n去客厅打开键盘锁", 2.5, func():
-			_hud.show_narrative("")
-			_keypad.show_for_code(_mode.get_code())
-		)
+	get_tree().create_timer(2.0).timeout.connect(func():
+		_hud.show_narrative("")
+		if _solved_count >= 3:
+			_all_solved()
+	)
+
+
+func _all_solved() -> void:
+	var code := ""
+	for d in _code_digits:
+		code += str(d)
+	_story_phase = 2
+	_hud.update_layer(1)
+	_hud.update_info("密码: %s  去客厅输入键盘!" % code)
+	_narrate("三个谜题都解开了…\n密码是 %s\n去客厅的键盘输入吧。" % code, 3.0, func():
+		_hud.show_narrative("")
+		_keypad.show_for_code(code)
+	)
+	_mode.code = code
 
 
 # --- 键盘解锁 ---
 
 func on_keypad_unlocked() -> void:
-	_narrate("咔嗒——锁开了。\n卧室的门应该能打开了...", 2.5, func():
-		_hud.show_narrative("")
+	_narrate("咔——锁芯转动。\n卧室的门可以打开了。", 2.5, func():
 		_hud.update_layer(2)
 		_hud.update_info("去卧室! 光照门锁按 Enter 逃脱")
 		_door.activate(_spotlight)
@@ -168,7 +197,7 @@ func _on_escaped() -> void:
 	_mode.escape()
 	var score := _mode.get_score()
 	var rating := _mode.get_rating()
-	_narrate("门开了。光芒涌进来。\n你想起了自己的名字。\n但这只是开始...", 3.0, func():
+	_narrate("阳光刺破黑暗。\n门外站着一个熟悉的身影。\n「你终于醒了。」\n—— 那是你自己。", 4.0, func():
 		_hud.update_layer(3)
 		_hud.show_escaped(score, rating)
 		_hud.show_narrative("")
@@ -192,6 +221,14 @@ func _process(delta: float) -> void:
 	_mode.track_focus(_spotlight.focus_ratio)
 	_hud.update_timer(_mode.elapsed_time)
 	_hud.update_focus(_spotlight.focus_ratio)
+
+	# 食谱: 当光照超过2秒自动读取
+	if _story_phase >= 1 and not _recipe.solved and _spotlight:
+		var rcenter := _recipe.global_position + _recipe.size / 2.0
+		if rcenter.distance_to(_spotlight.global_position) < _spotlight.get_radius() * 0.5:
+			_recipe._focus_time += delta
+			if _recipe._focus_time >= 2.0:
+				_on_recipe_read()
 
 
 # --- 键盘 ---
@@ -222,8 +259,9 @@ func _restart() -> void:
 	for child in get_children():
 		if child.name != "Background":
 			child.queue_free()
-	_digits.clear()
 	_keyboard_focus = false
 	_story_phase = 0
+	_solved_count = 0
+	_code_digits = [0, 0, 0, 0]
 	await get_tree().process_frame
 	_on_paradigm_start()
