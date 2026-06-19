@@ -33,7 +33,7 @@ func _process(_delta: float) -> void:
 	if found or _spotlight == null or _label == null:
 		return
 
-	var dist := position.distance_to(_spotlight.position)
+	var dist := global_position.distance_to(_spotlight.global_position)
 	var radius := _spotlight.get_radius()
 
 	# 光照到 → 显示, 越近越亮
