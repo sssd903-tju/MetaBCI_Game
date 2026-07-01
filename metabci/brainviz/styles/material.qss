@@ -1,0 +1,64 @@
+/* Material Design 暗色主题 — MetaBCI BrainViz */
+
+QMainWindow {
+    background-color: #121212;
+}
+
+QTabWidget::pane {
+    border: none;
+    background: #121212;
+    padding: 2px;
+}
+
+QTabBar::tab {
+    background: #1E1E1E;
+    color: #9E9E9E;
+    padding: 10px 24px;
+    margin-right: 2px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+QTabBar::tab:selected {
+    background: #121212;
+    color: #FFFFFF;
+    border-bottom: 3px solid #1976D2;
+}
+
+QTabBar::tab:hover:!selected {
+    color: #E0E0E0;
+    background: #2C2C2C;
+}
+
+QStatusBar {
+    background: #1E1E1E;
+    color: #9E9E9E;
+    border-top: 1px solid #424242;
+    font-size: 11px;
+    padding: 4px 8px;
+}
+
+QToolTip {
+    background: #2C2C2C;
+    color: #FFFFFF;
+    border: 1px solid #1976D2;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+QScrollBar:vertical {
+    background: #121212;
+    width: 8px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical {
+    background: #424242;
+    border-radius: 4px;
+    min-height: 30px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
