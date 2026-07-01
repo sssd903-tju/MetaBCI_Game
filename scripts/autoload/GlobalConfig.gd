@@ -39,11 +39,10 @@ const PANEL_BORDER := Color("D5CFBF")          # 卡片边框
 # 专注度检测 — 阈值配置
 # ============================================================
 
-# 专注度 = (theta + alpha) / beta 的比值
-# 比值越高 → 越放松/专注（闭眼放松状态 alpha 增强）
-# 比值越低 → 越紧张/分心
-const FOCUS_HIGH_THRESHOLD := 2.5    # >= 此值: 高专注
-const FOCUS_MEDIUM_THRESHOLD := 1.5  # >= 此值: 中等专注
+# 专注度百分制 (基线=50, 0-100)
+# 高专注 > 基线, 低专注 < 基线
+const FOCUS_HIGH_THRESHOLD := 65    # >= 此值: 高专注
+const FOCUS_MEDIUM_THRESHOLD := 35  # >= 此值: 中等专注
 # < FOCUS_MEDIUM_THRESHOLD: 低专注
 
 # ============================================================

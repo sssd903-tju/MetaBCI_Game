@@ -134,6 +134,16 @@ func stop_charge() -> void:
 		_charge_player = null
 
 
+func play_baseline_complete() -> void:
+	# 基线采集完成 — 升调双音提示
+	var p1 := _create_player()
+	p1.stream = _gen_tone(0.15, 660.0, 0.3)
+	_add_and_play(p1)
+	var p2 := _create_player()
+	p2.stream = _gen_tone(0.25, 880.0, 0.35)
+	get_tree().create_timer(0.15).timeout.connect(_add_and_play.bind(p2))
+
+
 # ============================================================
 # 内部方法
 # ============================================================

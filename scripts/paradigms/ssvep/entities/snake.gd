@@ -1,6 +1,5 @@
 extends Node2D
 class_name MindSnake
-## Snake — 网格贪吃蛇
 
 const CELL := 35
 const GRID_W := 40
@@ -13,6 +12,7 @@ var dirs := {
 }
 
 var body: Array[Vector2i] = []
+var _display_positions: Array = []
 var direction: Vector2i = dirs["right"]
 var next_direction: Vector2i = dirs["right"]
 var _tick_timer: float = 0.0
@@ -43,56 +43,53 @@ func reset() -> void:
 	alive = true
 	paused = true
 	score = 0
+	_display_positions.clear()
+	for seg in body:
+		_display_positions.append(Vector2(seg) * CELL + grid_offset + Vector2.ONE * CELL / 2.0)
 	queue_redraw()
 
 
 func set_direction(dir_name: String) -> void:
-	if not dirs.has(dir_name):
-		return
+	if not dirs.has(dir_name): return
 	var nd: Vector2i = dirs[dir_name]
-	# 禁止反向
-	if nd == -direction:
-		return
+	if nd == -direction: return
 	next_direction = nd
 
 
 func _process(delta: float) -> void:
-	if not alive or paused:
-		return
+	_update_display(delta)
+	if not alive or paused: return
 	_tick_timer += delta
 	if _tick_timer >= _tick_interval:
 		_tick_timer = 0.0
 		_tick()
 
 
+func _update_display(delta: float) -> void:
+	while _display_positions.size() < body.size():
+		_display_positions.append(Vector2(body[_display_positions.size()]) * CELL + grid_offset + Vector2.ONE * CELL / 2.0)
+	for i in range(body.size()):
+		var target := Vector2(body[i]) * CELL + grid_offset + Vector2.ONE * CELL / 2.0
+		if i < _display_positions.size():
+			_display_positions[i] = _display_positions[i].lerp(target, 15.0 * delta)
+	queue_redraw()
+
+
 func _tick() -> void:
 	direction = next_direction
 	var head := body[0] + direction
-
-	# 撞墙
 	if head.x < 0 or head.x >= GRID_W or head.y < 0 or head.y >= GRID_H:
-		alive = false
-		queue_redraw()
-		return
-
-	# 撞自己
+		alive = false; queue_redraw(); return
 	if head in body:
-		alive = false
-		queue_redraw()
-		return
-
+		alive = false; queue_redraw(); return
 	body.insert(0, head)
-	if _grow_pending > 0:
-		_grow_pending -= 1
-	else:
-		body.pop_back()
-
+	if _grow_pending > 0: _grow_pending -= 1
+	else: body.pop_back()
 	queue_redraw()
 
 
 func grow(n: int = 1) -> void:
 	_grow_pending += n
-	# 加速
 	_tick_interval = maxf(0.08, _tick_interval - 0.015)
 
 
@@ -101,32 +98,35 @@ func get_head() -> Vector2i:
 
 
 func get_head_screen_pos() -> Vector2:
+	if _display_positions.size() > 0: return _display_positions[0]
 	return Vector2(body[0]) * CELL + grid_offset + Vector2.ONE * CELL / 2.0
 
 
 func _draw() -> void:
 	# 网格边框
-	var border_rect := Rect2(grid_offset, Vector2(GRID_W * CELL, GRID_H * CELL))
-	draw_rect(border_rect, Color("3F6850"), false, 3.0)
-
-	if body.is_empty():
-		return
+	draw_rect(Rect2(grid_offset, Vector2(GRID_W * CELL, GRID_H * CELL)), Color("3F6850"), false, 3.0)
+	if body.is_empty(): return
 
 	for i in range(body.size()):
 		var seg := body[i]
-		var pos := Vector2(seg) * CELL + Vector2.ONE * CELL / 2.0 + grid_offset
+		var pos: Vector2
+		if i < _display_positions.size():
+			pos = _display_positions[i]
+		else:
+			pos = Vector2(seg) * CELL + Vector2.ONE * CELL / 2.0 + grid_offset
 		var color: Color
 		if i == 0:
 			color = Color("4A90D9")
-			draw_rect(Rect2(pos - Vector2.ONE * CELL / 2.0 - Vector2.ONE * 2, Vector2.ONE * CELL + Vector2.ONE * 4), color, true)  # 方头大
+			draw_rect(Rect2(pos - Vector2.ONE * CELL / 2.0 - Vector2.ONE * 2, Vector2.ONE * CELL + Vector2.ONE * 4), color, true)
 		else:
-			var t := float(i) / float(body.size())
-			color = Color("4A90D9").darkened(t * 0.6)
-		draw_rect(Rect2(pos - Vector2.ONE * CELL / 2.0 + Vector2.ONE, Vector2.ONE * CELL - Vector2.ONE * 2), color, true)
+			var t_val: float = float(i) / float(body.size())
+			color = Color("4A90D9").darkened(t_val * 0.6)
+			draw_rect(Rect2(pos - Vector2.ONE * CELL / 2.0 + Vector2.ONE, Vector2.ONE * CELL - Vector2.ONE * 2), color, true)
 
 	# 眼睛
 	if body.size() > 0:
-		var hp := Vector2(body[0]) * CELL + grid_offset + Vector2.ONE * CELL / 2.0
+		var hp: Vector2 = Vector2(body[0]) * CELL + grid_offset + Vector2.ONE * CELL / 2.0
+		if _display_positions.size() > 0: hp = _display_positions[0]
 		var ed := direction * CELL * 0.25
 		draw_circle(hp + ed - Vector2(0, CELL * 0.12), 3, Color.WHITE)
 		draw_circle(hp + ed + Vector2(0, CELL * 0.12), 3, Color.WHITE)

@@ -14,7 +14,7 @@ func _ready() -> void:
 
 	var modes := [
 		{"name": "🏹 凝神一矢", "scene": "res://scenes/focus_detection/archery_game.tscn"},
-		{"name": "🔦 专注之光", "scene": "res://scenes/focus_detection/escape_game.tscn"},
+		{"name": "🌊 深海下潜", "scene": "res://scenes/focus_detection/dive_game.tscn"},
 	]
 	for i in range(modes.size()):
 		var m: Dictionary = modes[i]

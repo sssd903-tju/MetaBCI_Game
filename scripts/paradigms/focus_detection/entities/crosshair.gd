@@ -9,7 +9,7 @@ class_name ArcheryCrosshair
 @export var jitter_strength := 7.0
 
 # 当前专注度
-var focus_ratio := 1.5
+var focus_ratio := 50.0
 
 # 是否激活（AIMING 状态才移动）
 var active := false
@@ -73,19 +73,19 @@ func _process(delta: float) -> void:
 	if focus_ratio >= GlobalConfig.FOCUS_HIGH_THRESHOLD:
 		# 高专注：向靶心快速靠拢，微抖
 		direction = to_center.normalized()
-		speed = base_speed * (1.6 + (focus_ratio - 2.5) * 1.4)
+		speed = base_speed * (1.6 + (focus_ratio - 70.0) / 30.0 * 1.4)
 		_update_jitter(delta, 0.05)  # 极低抖动
 
 	elif focus_ratio >= GlobalConfig.FOCUS_MEDIUM_THRESHOLD:
-		# 中专注：慢速靠拢，高抖动
+		# 中专注：中速靠拢，中抖动
 		direction = to_center.normalized()
-		speed = base_speed * 0.50
-		_update_jitter(delta, 0.5)
+		speed = base_speed * 0.65
+		_update_jitter(delta, 0.42)
 
 	else:
 		# 低专注：向外漂移 + 强烈抖动
 		direction = -to_center.normalized()
-		speed = base_speed * (1.5 - focus_ratio) * 0.8
+		speed = base_speed * maxf(35.0 - focus_ratio, 0.0) / 35.0 * 1.2
 		_update_jitter(delta, 1.5)
 
 	# 更新位置

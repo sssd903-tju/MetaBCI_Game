@@ -1,7 +1,7 @@
 extends BaseParadigm
-## FocusParadigm — 专注度检测范式入口
+## FocusParadigm — 凝神一矢：专注度检测·射箭范式
 ##
-## 管理: 状态机 + 模式 + 靶子 + 准星 + HUD
+## 管理: 基线采集 → 状态机 + 模式 + 靶子 + 准星 + HUD
 
 # 场景组件
 var _sm: ArcheryStateMachine
@@ -11,10 +11,21 @@ var _crosshair: ArcheryCrosshair
 var _hud: ArcheryHUD
 var _distractor_spawner: DistractorSpawner
 
-# 当前专注度
-var _current_focus := 1.5
-var _peek_focus := 1.5  # 射箭时刻的专注度
+# 当前专注度 (百分制 0-100)
+var _current_focus := 50
+var _peek_focus := 50  # 射箭时刻的专注度
 var _last_result: Dictionary = {}  # 最近一次射箭结果
+
+# 基线采集 — 独立全屏界面
+enum Phase { BASELINE_INTRO, BASELINE, PLAYING, OVER }
+var _phase: int = Phase.BASELINE_INTRO
+var _baseline_timer: float = 10.0
+var _baseline_screen: Control
+var _baseline_title: Label
+var _baseline_instruction: Label
+var _baseline_countdown: Label
+var _baseline_bar: ColorRect
+var _baseline_bg: ColorRect
 
 
 func _ready() -> void:
@@ -25,6 +36,26 @@ func _ready() -> void:
 func _on_paradigm_start() -> void:
 	_setup_background()
 	_setup_game()
+	_phase = Phase.BASELINE_INTRO
+	_baseline_timer = 10.0
+	BCIConnector.send_game_event("baseline_start", {})
+	_show_baseline_screen()
+
+
+func _begin_baseline() -> void:
+	_phase = Phase.BASELINE
+	_baseline_timer = 10.0
+	_baseline_title.text = "基线校准"
+	_baseline_instruction.text = "请放松，闭上眼睛，保持自然呼吸"
+	_baseline_bg.visible = true
+	_baseline_bar.visible = true
+
+
+func _baseline_done() -> void:
+	_phase = Phase.PLAYING
+	_hide_baseline_screen()
+	BCIConnector.send_game_event("baseline_done", {})
+	AudioManager.play_baseline_complete()
 	_mode.start_new_game()
 	_sm._enter_ready()
 
@@ -34,9 +65,99 @@ func _on_paradigm_end() -> void:
 
 
 func _on_bci_data(data: Dictionary) -> void:
-	_current_focus = data.get("ratio", 1.5)
+	_current_focus = float(BCIConnector.latest_focus_pct)
 	_crosshair.focus_ratio = _current_focus
 	_hud.update_focus(_current_focus)
+
+
+# ============================================================
+# 基线采集 — 独立全屏界面
+# ============================================================
+
+func _create_baseline_screen() -> void:
+	_baseline_screen = Control.new()
+	_baseline_screen.name = "BaselineScreen"
+	_baseline_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_baseline_screen)
+
+	# 半透明背景 — 莫兰迪暖米色
+	var overlay := ColorRect.new()
+	overlay.color = Color("EFE9D8", 1.0)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_baseline_screen.add_child(overlay)
+
+	# 图标
+	var icon := Label.new()
+	icon.text = "🧘"
+	icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	icon.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	icon.add_theme_font_size_override("font_size", 64)
+	icon.position = Vector2(0, 160)
+	icon.size = Vector2(GlobalConfig.GAME_WIDTH, 80)
+	_baseline_screen.add_child(icon)
+
+	# 标题
+	_baseline_title = _make_baseline_label("准备校准", 32, Color("3F6850"))
+	_baseline_title.position = Vector2(0, 260)
+	_baseline_title.size = Vector2(GlobalConfig.GAME_WIDTH, 42)
+	_baseline_screen.add_child(_baseline_title)
+
+	# 引导文字
+	_baseline_instruction = _make_baseline_label("请放松，保持安静...", 20, Color("5A8A6A"))
+	_baseline_instruction.position = Vector2(0, 320)
+	_baseline_instruction.size = Vector2(GlobalConfig.GAME_WIDTH, 28)
+	_baseline_screen.add_child(_baseline_instruction)
+
+	# 进度条背景
+	_baseline_bg = ColorRect.new()
+	_baseline_bg.color = Color("D5CFBF", 0.6)
+	_baseline_bg.size = Vector2(400, 12)
+	_baseline_bg.position = Vector2((GlobalConfig.GAME_WIDTH - 400) / 2.0, 390)
+	_baseline_bg.visible = false
+	_baseline_screen.add_child(_baseline_bg)
+
+	# 进度条
+	_baseline_bar = ColorRect.new()
+	_baseline_bar.color = Color("5A8A6A")
+	_baseline_bar.size = Vector2(0, 12)
+	_baseline_bar.position = _baseline_bg.position
+	_baseline_bar.visible = false
+	_baseline_screen.add_child(_baseline_bar)
+
+	# 倒计时
+	_baseline_countdown = _make_baseline_label("", 48, Color("3F6850"))
+	_baseline_countdown.position = Vector2(0, 420)
+	_baseline_countdown.size = Vector2(GlobalConfig.GAME_WIDTH, 56)
+	_baseline_screen.add_child(_baseline_countdown)
+
+	# 底部提示
+	var hint := _make_baseline_label("脑电基线采集进行中，完成后自动开始游戏", 14, Color("8BA89A"))
+	hint.position = Vector2(0, GlobalConfig.GAME_HEIGHT - 60)
+	hint.size = Vector2(GlobalConfig.GAME_WIDTH, 20)
+	_baseline_screen.add_child(hint)
+
+
+func _make_baseline_label(text: String, font_size: int, color: Color) -> Label:
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.add_theme_font_size_override("font_size", font_size)
+	lbl.add_theme_color_override("font_color", color)
+	return lbl
+
+
+func _show_baseline_screen() -> void:
+	_baseline_screen.visible = true
+	_target.visible = false
+	_crosshair.visible = false
+	_hud.visible = false
+
+
+func _hide_baseline_screen() -> void:
+	_baseline_screen.visible = false
+	_target.visible = true
+	_crosshair.visible = true
+	_hud.visible = true
 
 
 # --- 场景构建 ---
@@ -71,7 +192,7 @@ func _setup_game() -> void:
 	# 计分模式
 	_mode = ArcheryMode.new()
 
-	# HUD
+	# HUD (创建基线界面需要 HUD 先存在)
 	_hud = ArcheryHUD.new()
 	_hud.name = "HUD"
 	_hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -89,6 +210,9 @@ func _setup_game() -> void:
 	_sm.fired.connect(_on_fired)
 	_sm.scoring_started.connect(_on_scoring)
 	_sm.finished.connect(_on_finished)
+
+	# 独立基线界面 (最上层，放在 HUD 内)
+	_create_baseline_screen()
 
 
 # --- 状态回调 ---
@@ -156,7 +280,23 @@ func _on_finished(_final_score: int) -> void:
 # --- 主循环 ---
 
 func _process(delta: float) -> void:
-	# 每帧同步专注度到准星和HUD（键盘模拟/BCI数据都覆盖）
+	match _phase:
+		Phase.BASELINE_INTRO:
+			_baseline_timer -= delta
+			if _baseline_timer <= 8.0:
+				_begin_baseline()
+		Phase.BASELINE:
+			_baseline_timer -= delta
+			_baseline_bar.size.x = _baseline_bg.size.x * (1.0 - _baseline_timer / 10.0)
+			_baseline_countdown.text = "%d" % int(_baseline_timer)
+			if _baseline_timer <= 0.0:
+				_baseline_done()
+			return
+		Phase.OVER:
+			return
+
+	# 每帧同步专注度到准星和HUD（BCI数据优先）
+	_current_focus = float(BCIConnector.latest_focus_pct)
 	_crosshair.focus_ratio = _current_focus
 	_hud.update_focus(_current_focus)
 
@@ -171,7 +311,7 @@ func _process(delta: float) -> void:
 			_fire_arrow()
 
 
-## 射箭：计算环数，记录分数，触发布状态机
+## 射箭：计算环数，记录分数，触发状态机
 func _fire_arrow() -> void:
 	AudioManager.play_bow_shoot()
 	var ring := _crosshair.get_hit_ring(_target)
@@ -192,15 +332,15 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		ParadigmManager.go_to_main_menu()
 
-	# 调试：模拟专注度
+	# 调试：模拟专注度 (百分制)
 	elif event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_1:
-				_current_focus = 0.8
+				_current_focus = 20
 			KEY_2:
-				_current_focus = 2.0
+				_current_focus = 50
 			KEY_3:
-				_current_focus = 3.2
+				_current_focus = 80
 
 
 func _restart() -> void:

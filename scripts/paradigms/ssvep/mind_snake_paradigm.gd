@@ -129,8 +129,8 @@ func _process(delta: float) -> void:
 					_decoded_dir = ""
 
 			# 检查吃食物
-			var h := _snake.get_head()
-			var f := _food.get_cell()
+			var h: Vector2i = _snake.get_head()
+			var f: Vector2i = _food.get_cell()
 			if absi(h.x - f.x) <= 1 and absi(h.y - f.y) <= 1:
 				_snake.grow()
 				_snake.score += MindSnakeMode.FOOD_SCORE

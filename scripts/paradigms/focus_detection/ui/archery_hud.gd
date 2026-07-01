@@ -108,10 +108,10 @@ func show_timer(visible: bool) -> void:
 
 
 func update_focus(ratio: float) -> void:
-	var pct := clampf(ratio / 4.0, 0.0, 1.0)
+	var pct := clampf(ratio / 100.0, 0.0, 1.0)
 	_focus_bar.size.x = _focus_bg.size.x * pct
 	_focus_bar.color = GlobalConfig.focus_to_color(ratio)
-	_focus_label.text = "专注度: %.1f" % ratio
+	_focus_label.text = "专注度: %d%%" % int(ratio)
 
 
 func show_result(result: Dictionary) -> void:

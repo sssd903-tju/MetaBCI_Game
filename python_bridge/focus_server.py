@@ -90,6 +90,11 @@ class FocusDetector:
         # 信号质量追踪
         self._quality = 0.0
 
+        # 基线矫正
+        self.baseline_ratio = 2.0
+        self._baseline_buffer: list[float] = []
+        self._baseline_active = False
+
     def add_sample(self, value: float) -> None:
         """添加单个样本到缓冲区"""
         self._buffer.append(value)
@@ -142,18 +147,47 @@ class FocusDetector:
 
         self._last_ratio = ratio
 
+        self.feed_baseline(ratio)
+
         # 限制异常值
         ratio = max(0.1, min(10.0, ratio))
 
         return {
             "type": "focus",
             "ratio": round(float(ratio), 2),
+            "pct": self.get_focus_pct(ratio),
             "theta": round(float(theta_power), 4),
             "alpha": round(float(alpha_power), 4),
             "beta": round(float(beta_power), 4),
             "quality": round(self._quality, 3),
             "timestamp_ms": int(now * 1000),
         }
+
+    def start_baseline(self) -> None:
+        """开始基线采集"""
+        self._baseline_buffer.clear()
+        self._baseline_active = True
+        logger.info("基线采集开始...")
+
+    def feed_baseline(self, ratio: float) -> None:
+        """喂入基线数据点"""
+        if self._baseline_active:
+            self._baseline_buffer.append(ratio)
+
+    def finish_baseline(self) -> float:
+        """结束基线, 返回平均比值"""
+        self._baseline_active = False
+        if self._baseline_buffer:
+            self.baseline_ratio = float(np.mean(self._baseline_buffer))
+            logger.info(f"基线矫正完成: {self.baseline_ratio:.2f}")
+        return self.baseline_ratio
+
+    def get_focus_pct(self, ratio: float) -> int:
+        """将原始比值转换为0-100百分制"""
+        if self.baseline_ratio <= 0:
+            return 50
+        pct = (ratio / self.baseline_ratio) * 50.0
+        return max(0, min(100, int(round(pct))))
 
     def _compute_psd(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """计算功率谱密度 (Welch 方法)"""
@@ -376,7 +410,11 @@ class FocusServer:
                 case "game_event":
                     event_name = data.get("event", "")
                     logger.info(f"游戏事件: {event_name} | {data.get('extra', {})}")
-                    if event_name == "game_over":
+                    if event_name == "baseline_start":
+                        self.detector.start_baseline()
+                    elif event_name == "baseline_done":
+                        self.detector.finish_baseline()
+                    elif event_name == "game_over":
                         logger.info(
                             f"  分数: {data.get('extra', {}).get('score', 0)}"
                         )

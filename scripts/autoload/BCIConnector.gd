@@ -26,6 +26,7 @@ var _url := ""
 
 ## 最新专注度数据
 var latest_focus_ratio := 0.0
+var latest_focus_pct := 50  # 0-100百分制
 var latest_theta := 0.0
 var latest_alpha := 0.0
 var latest_beta := 0.0
@@ -101,6 +102,7 @@ func _handle_packet(raw: String) -> void:
 	match data.get("type"):
 		"focus":
 			latest_focus_ratio = data.get("ratio", 0.0)
+			latest_focus_pct = data.get("pct", 50)
 			latest_theta = data.get("theta", 0.0)
 			latest_alpha = data.get("alpha", 0.0)
 			latest_beta = data.get("beta", 0.0)
