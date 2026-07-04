@@ -35,6 +35,13 @@ class FrameField:
             '校验':   (1, False),
             '帧尾':   (1, False),
         }
+        # 默认转换类型: 多字节→Int32有符号
+        if self.field_type in ('4Byte',):
+            self.convert_type = 'Int32'
+        elif self.field_type in ('2Byte', '3Byte'):
+            self.convert_type = 'Int16'
+        elif self.field_type in ('8Byte',):
+            self.convert_type = 'Int64'
         if self.field_type in type_map:
             self.byte_count, self.is_length = type_map[self.field_type]
         val_map = {

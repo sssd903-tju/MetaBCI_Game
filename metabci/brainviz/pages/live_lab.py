@@ -31,6 +31,7 @@ class LiveLabPage(QWidget):
         self._thread = None; self._worker = None
         self._srate = 250.0; self._n_channels = 8
         self._paradigm_id = 'focus'; self._wave_paused = False
+        self._recording = False; self._record_start = 0.0
         self._mode_lsl = True
         self._band_bars = {}; self._band_vals = {}
         self._setup(); self._scan_devices()
@@ -80,7 +81,7 @@ class LiveLabPage(QWidget):
         self._science.set_content(f'{para.name} · 实时监测', para.science.get('signal', ''))
 
     def _get_frame_channel_names(self):
-        """从已保存的帧格式配置中读取通道名称"""
+        """从已保存的帧格式配置中读取通道名称和数量"""
         import json, os
         try:
             config_path = os.path.expanduser('~/.metabci_serial_config.json')
@@ -93,10 +94,12 @@ class LiveLabPage(QWidget):
                         name = fd.get('name', '')
                         if name and name != '未命名':
                             names.append(name)
-                return names or None
+                        else:
+                            names.append(fd.get('field_type', 'Ch'))
+                return names
         except Exception:
             pass
-        return None
+        return []
 
     # ============================================================
     # UI
@@ -140,12 +143,23 @@ class LiveLabPage(QWidget):
         wave_card, wl, wave_title = self._card('实时波形')
         tr = QHBoxLayout(); tr.addWidget(wave_title); tr.addStretch()
         btn_s = 'padding:2px 8px;font-size:11px;'
+        self._show_preproc = False
+        self._preproc_btn = QPushButton('原始'); self._preproc_btn.setStyleSheet(btn_s)
+        self._preproc_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._preproc_btn.clicked.connect(self._toggle_preproc_view); tr.addWidget(self._preproc_btn)
+
         self._pause_btn = QPushButton('暂停'); self._pause_btn.setStyleSheet(btn_s)
         self._pause_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._pause_btn.clicked.connect(self._toggle_pause); tr.addWidget(self._pause_btn)
         reset_btn = QPushButton('重置'); reset_btn.setStyleSheet(btn_s)
         reset_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         reset_btn.clicked.connect(self._reset_wave); tr.addWidget(reset_btn)
+
+        clear_btn = QPushButton('清除'); clear_btn.setStyleSheet(btn_s)
+        clear_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        clear_btn.clicked.connect(self._clear_wave)
+        tr.addWidget(clear_btn)
+
         wl.replaceWidget(wave_title, QWidget()); wl.insertLayout(0, tr)
         wl.setContentsMargins(8, 4, 8, 8)
 
@@ -156,8 +170,28 @@ class LiveLabPage(QWidget):
         self._wave_plot.enableAutoRange(axis='y')
         self._wave_plot.setXRange(0, WAVEFORM_SECONDS)
         self._wave_curve = self._wave_plot.plot(pen=pg.mkPen(color=ACCENT, width=1.2))
+        self._wave_plot.sigRangeChanged.connect(self._on_range_changed)
         wl.addWidget(self._wave_plot)
-        self._ch_combo = QComboBox(); self._ch_combo.setFixedWidth(100); wl.addWidget(self._ch_combo)
+        # 通道 + 心率 + 录制 同一行
+        bot_row = QHBoxLayout()
+        self._ch_combo = QComboBox(); self._ch_combo.setFixedWidth(100)
+        self._ch_combo.currentIndexChanged.connect(self._on_channel_changed)
+        bot_row.addWidget(self._ch_combo)
+
+        self._hr_label = QLabel('')
+        self._hr_label.setStyleSheet('color:#E91E63;font-weight:bold;font-size:13px;border:none;')
+        bot_row.addWidget(self._hr_label)
+
+        bot_row.addStretch()
+        self._rec_btn = QPushButton('● 录制'); self._rec_btn.setStyleSheet(btn_s)
+        self._rec_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._rec_btn.clicked.connect(self._toggle_recording)
+        bot_row.addWidget(self._rec_btn)
+        self._rec_status = QLabel('')
+        self._rec_status.setStyleSheet(f'color:{TEXT3};font-size:10px;border:none;')
+        bot_row.addWidget(self._rec_status)
+        wl.addLayout(bot_row)
+
         grid.addWidget(wave_card, 0, 0)
 
         # 频谱
@@ -332,12 +366,16 @@ class LiveLabPage(QWidget):
     def _start_worker(self):
         self._worker = LiveWorker(self._buffer)
         self._worker.waveform_ready.connect(self._on_waveform)
+        self._worker.preproc_ready.connect(self._on_preproc)
         self._worker.spectrum_ready.connect(self._on_spectrum)
         self._worker.bands_ready.connect(self._on_bands)
         self._worker.focus_ready.connect(self._on_focus)
         self._worker.ssvep_ready.connect(self._on_ssvep)
         self._worker.p300_ready.connect(self._on_p300)
         self._worker.mi_ready.connect(self._on_mi)
+        # 恢复上次应用的预处理配置
+        if hasattr(self, '_saved_preproc_config') and self._saved_preproc_config:
+            self._worker.set_preproc(self._saved_preproc_config)
         self._worker.start()
 
     def _set_connected(self, name, info):
@@ -389,9 +427,10 @@ class LiveLabPage(QWidget):
         self._sync_paradigm()
 
     def _connect_serial(self, port: str):
-        import json, os
+        import json, os, logging
         from metabci.brainviz.serial_worker import SerialReader
         from metabci.brainviz.frame_field import FrameField
+        _log = logging.getLogger("brainviz")
         config_path = os.path.expanduser('~/.metabci_serial_config.json')
         baud = 115200; frame_fields = []
         try:
@@ -411,12 +450,16 @@ class LiveLabPage(QWidget):
                     )
                     f.value = fd.get('value', '')
                     frame_fields.append(f)
-        except Exception: pass
+                _log.info(f"加载帧格式: {len(frame_fields)} 字段")
+        except Exception as e:
+            _log.error(f"加载帧格式失败: {e}")
 
         try:
             self._srate = 250.0; self._n_channels = 8
             if self._buffer is None:
                 self._buffer = EEGBuffer(n_channels=self._n_channels, srate=self._srate)
+            else:
+                self._buffer.srate = self._srate
             self._thread = SerialReader(port=port, baudrate=baud, buffer=self._buffer,
                                         n_channels=self._n_channels, srate=self._srate,
                                         frame_fields=frame_fields)
@@ -436,13 +479,130 @@ class LiveLabPage(QWidget):
     # 波形控制
     # ============================================================
 
+    def _on_range_changed(self, _plot, _range):
+        # 只在用户用鼠标操作时标记 (程序设XRange也会触发此信号)
+        pass  # 不再锁定 — XRange 始终自动滑动
+
+    _hr_last_t = 0
+    def _update_hr(self, d):
+        """从 ECG 数据估算心率"""
+        ch_name = self._ch_combo.currentText()
+        if 'ECG' not in ch_name.upper() and '心电' not in ch_name:
+            self._hr_label.setText('')
+            return
+        import time as _time
+        now = _time.time()
+        if now - LiveLabPage._hr_last_t < 2.0: return  # 2秒算一次
+        LiveLabPage._hr_last_t = now
+        try:
+            import numpy as np
+            # 找R峰: 超过均值+2*std, 不应期0.25s(62样本@250Hz)
+            threshold = np.mean(d) + 2.0 * np.std(d)
+            refractory = int(250 * 0.25)  # 0.25s不应期
+            peaks = []
+            last_peak = -refractory
+            for i in range(1, len(d)-1):
+                if d[i] > threshold and d[i] > d[i-1] and d[i] > d[i+1] and i - last_peak >= refractory:
+                    peaks.append(i)
+                    last_peak = i
+            if len(peaks) >= 2:
+                # 平均RR间期 → BPM
+                rr_mean = np.mean(np.diff(peaks)) / 250.0  # 250Hz采样
+                bpm = 60.0 / rr_mean if rr_mean > 0 else 0
+                self._hr_label.setText(f'♥ {bpm:.0f} BPM')
+        except: pass
+
+    def _on_channel_changed(self, idx: int):
+        if self._worker and idx >= 0:
+            self._worker.set_wave_channel(idx)
+            self._y_set = False; self._y_set_pp = False
+        if 'ECG' not in self._ch_combo.currentText().upper():
+            self._hr_label.setText('')
+
     def _toggle_pause(self):
         self._wave_paused = not self._wave_paused
         self._pause_btn.setText('继续' if self._wave_paused else '暂停')
 
+    def _toggle_preproc_view(self):
+        self._show_preproc = not self._show_preproc
+        self._preproc_btn.setText('处理后' if self._show_preproc else '原始')
+        self._y_set_pp = False
+        # 立即用已有的预处理数据刷新
+        if self._show_preproc and hasattr(self, '_preproc_wave') and self._preproc_wave is not None:
+            t, d = self._preproc_wave
+            n = min(len(t), len(d))
+            if n > 1:
+                self._wave_curve.setData(t[:n], d[:n])
+                self._wave_plot.setXRange(t[0], t[-1], padding=0)
+
+    def _toggle_recording(self):
+        import os, json, time as _time
+        from datetime import datetime
+        import numpy as np
+
+        if self._recording:
+            self._recording = False
+            duration = _time.time() - self._record_start
+            if self._buffer and self._buffer.sample_count > 0:
+                tstamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                para = self._mw.current_paradigm
+                pname = para.paradigm_id if para else 'unknown'
+                dpath = os.path.join(os.path.expanduser('~/.metabci_recordings'), f'{pname}_{tstamp}')
+                os.makedirs(dpath, exist_ok=True)
+                # 只保存有数据的通道
+                ch_data = []
+                for ch in range(min(self._buffer.n_channels, 8)):
+                    cd = self._buffer.get_channel(ch)
+                    if len(cd) > 0: ch_data.append(cd)
+                data = np.column_stack(ch_data) if ch_data else np.array([])
+                nch = len(ch_data)
+                np.save(os.path.join(dpath, 'raw.npy'), data)
+                # 同时保存预处理后数据
+                if self._worker and hasattr(self._worker, '_preproc_cache') and len(self._worker._preproc_cache) > 0:
+                    precache = self._worker._preproc_cache
+                    if len(precache) >= data.shape[0]:
+                        precache = precache[-data.shape[0]:]
+                    np.save(os.path.join(dpath, 'preprocessed.npy'), precache)
+                meta = {'srate': self._buffer.srate, 'n_channels': nch,
+                        'duration': duration, 'samples': data.shape[0],
+                        'date': tstamp, 'paradigm': pname,
+                        'preproc': bool(self._worker and hasattr(self._worker, '_preproc_cache') and len(self._worker._preproc_cache) > 0)}
+                with open(os.path.join(dpath, 'meta.json'), 'w') as f:
+                    json.dump(meta, f, ensure_ascii=False, indent=2)
+            self._rec_btn.setText('● 录制')
+            self._rec_status.setText(f'已保存 ({duration:.0f}s)')
+        else:
+            if self._buffer is None or self._buffer.sample_count == 0:
+                QMessageBox.warning(self, '提示', '请先连接设备')
+                return
+            self._recording = True
+            self._record_start = _time.time()
+            self._rec_btn.setText('■ 停止')
+            self._rec_status.setText('录制中...')
+
+    def _on_user_scroll(self):
+        self._user_scrolling = True
+        # 3秒不动后恢复自动滚动
+        if hasattr(self, '_scroll_timer'):
+            self._scroll_timer.stop()
+        from PySide6.QtCore import QTimer
+        self._scroll_timer = QTimer(self)
+        self._scroll_timer.setSingleShot(True)
+        self._scroll_timer.timeout.connect(lambda: setattr(self, '_user_scrolling', False))
+        self._scroll_timer.start(3000)
+
     def _reset_wave(self):
+        self._user_scrolling = False
+        self._y_range_set = False
         self._wave_curve.clear()
+        self._y_range_set = False
         self._wave_plot.enableAutoRange(axis='x'); self._wave_plot.enableAutoRange(axis='y')
+
+    def _clear_wave(self):
+        self._wave_curve.clear()
+        self._y_range_set = False
+        self._wave_plot.disableAutoRange(axis='y')
+        self._wave_plot.setYRange(-500, 500)
 
     # ============================================================
     # 信号处理
@@ -450,9 +610,63 @@ class LiveLabPage(QWidget):
 
     def _on_waveform(self, t, d):
         if self._wave_paused: return
-        if len(t)>1 and len(d)>1:
-            self._wave_curve.setData(t, d)
-            self._wave_plot.setXRange(t[-1]-WAVEFORM_SECONDS, t[-1], padding=0)
+        if not self._show_preproc:
+            n = min(len(t), len(d))
+            if n > 1:
+                self._wave_curve.setData(t[:n], d[:n])
+                if not getattr(self, '_user_drag', False):
+                    self._wave_plot.setXRange(t[0], t[-1], padding=0)
+                if not hasattr(self, '_y_set') or not self._y_set:
+                    import numpy as np
+                    lo, hi = np.percentile(d[:n], 1), np.percentile(d[:n], 99)
+                    self._wave_plot.setYRange(lo-(hi-lo)*0.15, hi+(hi-lo)*0.15 if hi>lo else lo+1000, padding=0)
+                    self._y_set = True
+                # ECG心率
+                self._update_hr(d)
+                if self.isVisible(): self._wave_plot.update()
+
+    def _on_preproc(self, t, d):
+        if self._wave_paused: return
+        if self._show_preproc and len(t) > 1 and len(d) > 1:
+            n = min(len(t), len(d))
+            self._wave_curve.setData(t[:n], d[:n])
+            self._wave_plot.setXRange(t[0], t[-1], padding=0)  # 预处理强制更新X轴
+            if not hasattr(self, '_y_set_pp') or not self._y_set_pp:
+                import numpy as np
+                lo, hi = np.percentile(d[:n], 1), np.percentile(d[:n], 99)
+                self._wave_plot.setYRange(lo-(hi-lo)*0.15, hi+(hi-lo)*0.15 if hi>lo else lo+1000, padding=0)
+                self._y_set_pp = True
+            if self.isVisible(): self._wave_plot.update()
+
+    def _draw_wave(self):
+        if self._wave_paused: return
+        if self._show_preproc and hasattr(self, '_preproc_wave') and self._preproc_wave is not None:
+            t, d = self._preproc_wave
+            if len(t) == 0 or len(d) == 0:
+                data = getattr(self, '_raw_wave', None)
+                if data: t, d = data
+                else: return
+        else:
+            data = getattr(self, '_raw_wave', None)
+            if data is None: return
+            t, d = data
+        n = min(len(t), len(d))
+        if n > 1:
+            self._wave_curve.setData(t[:n], d[:n])
+            # X轴: 显示绝对时间 (自动滑动)
+            self._wave_plot.setXRange(t[0], t[-1], padding=0)
+            # Y轴: 首次设定后不再调整
+            if not hasattr(self, '_y_range_set') or not self._y_range_set:
+                import numpy as np
+                lo = np.percentile(d[:n], 1)
+                hi = np.percentile(d[:n], 99)
+                if hi > lo:
+                    margin = (hi - lo) * 0.15
+                    self._wave_plot.setYRange(lo - margin, hi + margin, padding=0)
+                else:
+                    # 常数值通道: 以数值为中心给个默认范围
+                    self._wave_plot.setYRange(lo - 1000, lo + 1000, padding=0)
+                self._y_range_set = True
             if self.isVisible():
                 self._wave_plot.update()
 

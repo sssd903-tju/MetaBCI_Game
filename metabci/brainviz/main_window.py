@@ -67,10 +67,11 @@ class NavButton(QPushButton):
 
 class MainWindow(QMainWindow):
     PAGES = {
-        'science_hub': '科普广场',
-        'live_lab':   '在线实验室',
-        'data_center': '数据中心',
-        'algo_lab':   '算法工坊',
+        'science_hub':  '科普广场',
+        'live_lab':     '在线实验室',
+        'game_platform':'游戏平台',
+        'algo_lab':     '算法工坊',
+        'data_center':  '数据中心',
     }
 
     def __init__(self, simulate: bool = False):
@@ -120,10 +121,11 @@ class MainWindow(QMainWindow):
 
         # Nav items
         nav_items = [
-            ('',  '科普广场', 'science_hub', ''),
-            ('',  '在线实验室', 'live_lab', ''),
-            ('',  '数据中心', 'data_center', ''),
-            ('',  '算法工坊', 'algo_lab', ''),
+            ('', '科普广场', 'science_hub', ''),
+            ('', '在线实验室', 'live_lab', ''),
+            ('', '游戏平台', 'game_platform', ''),
+            ('', '算法工坊', 'algo_lab', ''),
+            ('', '数据中心', 'data_center', ''),
         ]
         for icon, text, page, badge in nav_items:
             btn = NavButton(icon, text, page, badge)
@@ -196,6 +198,9 @@ class MainWindow(QMainWindow):
         elif name == 'algo_lab':
             from metabci.brainviz.pages.algo_lab import AlgoLabPage
             return AlgoLabPage(self)
+        elif name == 'game_platform':
+            from metabci.brainviz.pages.game_platform import GamePlatformPage
+            return GamePlatformPage(self)
         return QWidget()
 
     # ============================================================
