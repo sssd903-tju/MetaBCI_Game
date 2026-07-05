@@ -15,7 +15,7 @@ from PySide6.QtCore import Qt
 
 from metabci.brainviz.theme import TEXT, TEXT2, TEXT3, ACCENT, SURFACE, BORDER, GREEN
 
-DATA_DIR = os.path.expanduser('~/.metabci_recordings')
+DATA_DIR = os.path.expanduser('~/MetaBCI_Recordings')
 
 
 class DataCenterPage(QWidget):

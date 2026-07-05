@@ -14,6 +14,7 @@ from PySide6.QtGui import QFont
 
 from metabci.brainviz.config import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, PLOT_REFRESH_MS
 from metabci.brainviz.data_buffer import EEGBuffer
+from metabci.brainviz.game_bridge import GameBridge
 from metabci.brainviz.theme import TEXT, TEXT2, TEXT3, ACCENT, SURFACE2, BORDER, BG
 
 logger = logging.getLogger("brainviz")
@@ -67,11 +68,12 @@ class NavButton(QPushButton):
 
 class MainWindow(QMainWindow):
     PAGES = {
-        'science_hub':  '科普广场',
-        'live_lab':     '在线实验室',
-        'game_platform':'游戏平台',
-        'algo_lab':     '算法工坊',
-        'data_center':  '数据中心',
+        'science_hub':   '科普广场',
+        'live_lab':      '在线实验室',
+        'training_center':'训练中心',
+        'game_platform': '游戏平台',
+        'algo_lab':      '算法工坊',
+        'data_center':   '数据中心',
     }
 
     def __init__(self, simulate: bool = False):
@@ -83,6 +85,9 @@ class MainWindow(QMainWindow):
         self._nav_buttons: dict[str, NavButton] = {}
         self._page_cache: dict = {}
         self.current_paradigm = None  # shared across pages
+
+        # [MetaBCI] GameBridge — WebSocket → Godot 游戏
+        self.game_bridge = GameBridge(parent=self)
 
         self.setWindowTitle(WINDOW_TITLE)
         self.resize(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -123,6 +128,7 @@ class MainWindow(QMainWindow):
         nav_items = [
             ('', '科普广场', 'science_hub', ''),
             ('', '在线实验室', 'live_lab', ''),
+            ('', '训练中心', 'training_center', ''),
             ('', '游戏平台', 'game_platform', ''),
             ('', '算法工坊', 'algo_lab', ''),
             ('', '数据中心', 'data_center', ''),
@@ -198,6 +204,9 @@ class MainWindow(QMainWindow):
         elif name == 'algo_lab':
             from metabci.brainviz.pages.algo_lab import AlgoLabPage
             return AlgoLabPage(self)
+        elif name == 'training_center':
+            from metabci.brainviz.pages.training_center import TrainingCenterPage
+            return TrainingCenterPage(self)
         elif name == 'game_platform':
             from metabci.brainviz.pages.game_platform import GamePlatformPage
             return GamePlatformPage(self)
@@ -225,4 +234,6 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         if self._pull_thread:
             self._pull_thread.running = False
+        if self.game_bridge:
+            self.game_bridge.stop()
         event.accept()

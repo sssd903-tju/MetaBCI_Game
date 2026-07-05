@@ -43,14 +43,14 @@ STUDENT_GUIDE = """
 </div>"""
 
 FEATURE_GUIDE = {
-    'PSD频带能量': "<div style='line-height:1.8;'><h3>频带能量 — 数数不同节奏的脑电波</h3><p>就像音乐有低音、中音、高音，脑电波也分五个频段：</p><table><tr><td>δ 0.5-4Hz</td><td>深度睡眠时的慢波</td></tr><tr><td>θ 4-8Hz</td><td>放松、发呆时出现</td></tr><tr><td>α 8-13Hz</td><td>闭眼放松、平静专注</td></tr><tr><td>β 13-30Hz</td><td>思考、紧张、专注</td></tr><tr><td>γ 30-45Hz</td><td>高度集中、信息整合</td></tr></table><p>专注度 = (θ+α)/β。越放松专注，α和θ越强，分数越高！</p></div>",
+    'PSD频带能量': "<div style='line-height:1.8;'><h3>频带能量 — 数数不同节奏的脑电波</h3><p>就像音乐有低音、中音、高音，脑电波也分五个频段：</p><table><tr><td>δ 0.5-4Hz</td><td>深度睡眠时的慢波</td></tr><tr><td>θ 4-8Hz</td><td>放松、发呆时出现</td></tr><tr><td>α 8-13Hz</td><td>闭眼放松、平静专注</td></tr><tr><td>β 13-30Hz</td><td>思考、紧张、专注</td></tr><tr><td>γ 30-45Hz</td><td>高度集中、信息整合</td></tr></table><p>专注度 = β/(θ+α)。越放松专注，β越强、α越弱，分数越高！</p></div>",
     'CSP空间滤波': "<div style='line-height:1.8;'><h3>CSP — 找到左右手的'开关'</h3><p>想象一下：C3和C4两个电极在头顶两侧。</p><p>想象<b>左手</b>动 → C4活跃、C3安静<br>想象<b>右手</b>动 → C3活跃、C4安静</p><p>CSP算法就是找到<b>让这个差异最大化的方法</b>，就像调收音机找到最清晰的频道。</p></div>",
     'CCA特征': "<div style='line-height:1.8;'><h3>CCA — 脑电波'和声'检测</h3><p>你盯着一个以10Hz闪烁的光，后脑勺的脑细胞就会跟着10Hz的节奏一起'唱歌'。</p><p>CCA算法做的事：<b>拿各个频率的'歌谱'去和脑电波对比，看和哪个频率最合拍。</b>最合拍的那个就是你正在看的方向！</p></div>",
     '时域分段': "<div style='line-height:1.8;'><h3>时域分段 — 给脑电波'拍照'</h3><p>每次刺激出现（比如卡牌闪了一下），大脑都会做出反应。</p><p>我们以刺激出现的瞬间为基准，截取前后一小段脑电波。多截几次，叠加平均，随机噪声抵消了，P300信号就浮现出来了！</p></div>",
 }
 
 CLASSIFIER_GUIDE = {
-    '(θ+α)/β 比值': "<div style='line-height:1.8;'><h3>专注度 = (θ+α) ÷ β</h3><p>很简单！放松时的α和θ能量，除以紧张时的β能量。</p><p>比值<b>越高 → 越专注</b>，比值<b>越低 → 越紧张</b>。</p><p>游戏前先测10秒你的'平静状态'作为基准（100%），之后就能看到自己是比平时更专注还是更分心。</p></div>",
+    'β/(θ+α) 比值': "<div style='line-height:1.8;'><h3>专注度 = β ÷ (θ+α)</h3><p>很简单！放松时的α和θ能量，除以紧张时的β能量。</p><p>比值<b>越高 → 越专注</b>，比值<b>越低 → 越分心</b>。</p><p>游戏前先测10秒你的'平静状态'作为基准（100%），之后就能看到自己是比平时更专注还是更分心。</p></div>",
     'CCA分类': "<div style='line-height:1.8;'><h3>CCA — 最佳匹配 wins!</h3><p>四个方向、四个频率。CCA算出哪个频率和脑电波最'合拍'，那个方向就赢了！</p><p>就像KTV打分——你唱得最接近哪首歌的旋律，就判定你唱的是哪首。</p></div>",
     'LDA': "<div style='line-height:1.8;'><h3>LDA — 画一条线分开两类</h3><p>想象黑棋和白棋混在一起，LDA就是找到最好的一条线把它们分开。</p><p>对P300：分开'目标刺激'和'非目标刺激'的脑电反应。<br>对MI：分开'左手想'和'右手想'的脑电特征。</p></div>",
 }
@@ -59,7 +59,7 @@ CLASSIFIER_GUIDE = {
 FEATURE_OPTIONS = {
     'focus': [
         ('PSD频带能量', 'Welch方法计算δθαβγ功率谱密度',
-         '<h3>PSD 频带能量</h3><p>使用Welch方法计算功率谱密度，提取五个频带能量：δ(0.5-4) θ(4-8) α(8-13) β(13-30) γ(30-45)。</p><p>专注度=(θ+α)/β 就是基于这些频带。</p><p><b>MetaBCI:</b> <code>brainda.algorithms.feature_analysis.freq_analysis</code></p>'),
+         '<h3>PSD 频带能量</h3><p>使用Welch方法计算功率谱密度，提取五个频带能量：δ(0.5-4) θ(4-8) α(8-13) β(13-30) γ(30-45)。</p><p>专注度=β/(θ+α) 就是基于这些频带。</p><p><b>MetaBCI:</b> <code>brainda.algorithms.feature_analysis.freq_analysis</code></p>'),
     ],
     'ssvep': [
         ('CCA特征', '多通道典型相关分析提取频率成分',
@@ -79,8 +79,8 @@ FEATURE_OPTIONS = {
 
 CLASSIFIER_OPTIONS = {
     'focus': [
-        ('(θ+α)/β 比值', '频带能量比值计算专注度百分制',
-         '<h3>(θ+α)/β 专注度算法</h3><p>这是我们为MetaBCI新增的专注度评估算法。计算θ和α能量之和与β能量的比值，再转为百分制。</p><p><b>MetaBCI新增:</b> 专注度评估算法</p>'),
+        ('β/(θ+α) 比值', '频带能量比值计算专注度百分制',
+         '<h3>β/(θ+α) 专注度算法</h3><p>这是我们为MetaBCI新增的专注度评估算法。计算θ和α能量之和与β能量的比值，再转为百分制。</p><p><b>MetaBCI新增:</b> 专注度评估算法</p>'),
     ],
     'ssvep': [
         ('CCA分类', '最大相关系数对应频率即为目标',
@@ -178,9 +178,9 @@ class AlgoLabPage(QWidget):
         super().__init__()
         self._mw = main_window
         self._paradigm_id = 'focus'
-        self._preproc_selected = {'带通滤波': True, '陷波滤波': False, '基线校正': False}
+        self._preproc_selected = {'带通滤波': True, '陷波滤波': True, '基线校正': False}
         self._feature_selected = {'focus': 'PSD频带能量', 'ssvep': 'CCA特征', 'p300': '时域分段', 'mi': 'CSP空间滤波'}
-        self._classifier_selected = {'focus': '(θ+α)/β 比值', 'ssvep': 'CCA分类', 'p300': 'LDA', 'mi': 'LDA'}
+        self._classifier_selected = {'focus': 'β/(θ+α) 比值', 'ssvep': 'CCA分类', 'p300': 'LDA', 'mi': 'LDA'}
         self._setup()
 
     def _setup(self):
@@ -234,7 +234,7 @@ class AlgoLabPage(QWidget):
         pipe_row.addWidget(_arrow())
 
         # 分类器
-        self._class_node = SlotNode('分类器', '(θ+α)/β 比值')
+        self._class_node = SlotNode('分类器', 'β/(θ+α) 比值')
         self._class_node.clicked.connect(self._toggle_classifier_options)
         pipe_row.addWidget(self._class_node)
         pipe_row.addWidget(_arrow())
@@ -389,9 +389,9 @@ class AlgoLabPage(QWidget):
             QMessageBox.warning(self, '提示', '请先在在线实验室连接设备')
 
     def _reset(self):
-        self._preproc_selected = {'带通滤波': True, '陷波滤波': False, '基线校正': False}
+        self._preproc_selected = {'带通滤波': True, '陷波滤波': True, '基线校正': False}
         self._feature_selected = {'focus': 'PSD频带能量', 'ssvep': 'CCA特征', 'p300': '时域分段', 'mi': 'CSP空间滤波'}
-        self._classifier_selected = {'focus': '(θ+α)/β 比值', 'ssvep': 'CCA分类', 'p300': 'LDA', 'mi': 'LDA'}
+        self._classifier_selected = {'focus': 'β/(θ+α) 比值', 'ssvep': 'CCA分类', 'p300': 'LDA', 'mi': 'LDA'}
         for name, cb in self._preproc_cbs.items():
             cb.setChecked(self._preproc_selected.get(name, False))
         self._update_all()

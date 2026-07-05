@@ -410,7 +410,7 @@ class BrainVizGUI(QMainWindow):
         self._classification.update_bands(power_map, max_p)
 
         self._classification.set_status(
-            f"θ+α/β = {ratio:.2f}  →  专注度: {focus_pct}%\n"
+            f"β/(θ+α) = {ratio:.2f}  →  专注度: {focus_pct}%\n"
             f"δ:{power_map.get('δ delta',0):.1f}  θ:{theta:.1f}  "
             f"α:{alpha_:.1f}  β:{beta:.1f}  γ:{power_map.get('γ gamma',0):.1f}"
         )
