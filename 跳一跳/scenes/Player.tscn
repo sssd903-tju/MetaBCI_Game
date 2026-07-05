@@ -1,0 +1,44 @@
+[gd_scene load_steps=3 format=3 uid="uid://bevcd1f6y0g1h"]
+
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_pl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(34, 34)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_pl")
+
+[node name="Visual" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-18, -18, 18, -18, 18, 18, -18, 18)
+color = Color(0.831373, 0.8, 0.662745, 1)
+
+[node name="ChargeBar" type="Node2D" parent="."]
+position = Vector2(-34, -20)
+
+[node name="BarBG" type="Polygon2D" parent="ChargeBar"]
+color = Color(0.52549, 0.588235, 0.513725, 0.8)
+
+[node name="BarFill" type="Polygon2D" parent="ChargeBar"]
+color = Color(0.443137, 0.67451, 0.490196, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="LandingDust" type="CPUParticles2D" parent="."]
+position = Vector2(0, 18)
+emitting = false
+amount = 12
+lifetime = 0.32
+one_shot = true
+preprocess = 0.0
+speed_scale = 1.0
+explosiveness = 0.92
+randomness = 0.4
+direction = Vector2(0, -1)
+spread = 96.0
+gravity = Vector2(0, 420)
+initial_velocity_min = 24.0
+initial_velocity_max = 72.0
+scale_amount_min = 1.1
+scale_amount_max = 2.1
+color = Color(0.82, 0.76, 0.63, 0.85)
