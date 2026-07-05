@@ -23,7 +23,7 @@ class ClassificationPanel(QWidget):
         layout.setSpacing(8)
 
         title = QLabel("🎯 实时指标")
-        title.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 14px;")
+        title.setStyleSheet(f"color: {COLORS['on_surface']}; font-size: 14px;")
         layout.addWidget(title)
 
         # 专注度
@@ -115,7 +115,7 @@ class ClassificationPanel(QWidget):
         self._status_lbl.setText(text)
 
     @staticmethod
-    def _lbl(text: str, size: int = 12, color: str = COLORS["text_primary"],
+    def _lbl(text: str, size: int = 12, color: str = COLORS["on_surface"],
              width: int | None = None, bold: bool = False) -> QLabel:
         lbl = QLabel(text)
         w = f"font-weight: bold;" if bold else ""
