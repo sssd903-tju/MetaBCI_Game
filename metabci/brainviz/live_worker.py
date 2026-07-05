@@ -7,8 +7,8 @@ from metabci.brainviz.config import BANDS
 
 logger = logging.getLogger("brainviz.worker")
 # [MetaBCI] SSVEP 目标频率 — 默认贪吃蛇 2频(8/15Hz), 打地鼠7频
-SSVEP_FREQS = [8.0, 15.0]
-MOLE_FREQS = [8.0, 15.0]  # 打地鼠也仅2频, 适配自制硬件
+SSVEP_FREQS = [8.0, 10.0, 12.0, 15.0]
+MOLE_FREQS = [8.0, 10.0, 12.0, 15.0]  # 打地鼠 4频
 
 
 class LiveWorker(QThread):
@@ -317,7 +317,7 @@ class LiveWorker(QThread):
                 best_f, conf = self._decode_ssvep_scca(data, srate)
                 method = 'SCCA'
 
-            d = {8.0: '↑', 15.0: '←'}
+            d = {8.0: '↑', 10.0: '→', 12.0: '↓', 15.0: '←'}
             direction = d.get(best_f, f'{best_f:.0f}Hz')
             print(f"[SSVEP:{method}] {best_f:.0f}Hz conf={conf:.2f} {direction}")
             self.ssvep_ready.emit(best_f, direction)

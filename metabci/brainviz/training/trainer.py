@@ -167,9 +167,12 @@ def run_focus_baseline(duration: int = 30):
 
 # 思维贪吃蛇: ↑8Hz →10Hz ↓12Hz ←15Hz
 SNAKE_FREQS = {
-    "up": 8.0, "left": 15.0,
+    "up": 8.0, "right": 10.0, "down": 12.0, "left": 15.0,
 }
-SNAKE_LABELS = {"up": "▲ 上 (8Hz)", "left": "◀ 左 (15Hz)"}
+SNAKE_LABELS = {
+    "up": "▲ 上 (8Hz)", "right": "→ 右 (10Hz)",
+    "down": "↓ 下 (12Hz)", "left": "← 左 (15Hz)",
+}
 
 # 打地鼠: 7 个频率池 (2×2 ~ 4×4 网格)
 MOLE_FREQ_POOL = [8.0, 9.2, 10.4, 11.6, 13.0, 14.4, 15.6]
