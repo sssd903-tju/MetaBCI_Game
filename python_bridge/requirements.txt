@@ -9,7 +9,7 @@ scipy>=1.10
 pylsl>=1.16
 
 # WebSocket server for Godot communication
-websockets>=12.0
+websockets>=16.1
 
 # Real-time filtering
 mne>=1.5
