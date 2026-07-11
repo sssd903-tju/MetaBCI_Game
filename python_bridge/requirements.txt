@@ -3,7 +3,7 @@
 
 # Core EEG processing
 numpy>=1.24
-scipy>=1.10
+scipy>=1.15.3
 
 # LSL (Lab Streaming Layer) for EEG data streaming
 pylsl>=1.16
