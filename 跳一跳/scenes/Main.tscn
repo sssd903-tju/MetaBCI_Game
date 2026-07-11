@@ -1,0 +1,420 @@
+[gd_scene format=3 uid="uid://cih1hxm1n25s8"]
+
+[ext_resource type="Script" uid="uid://bxbiorwpbtbtr" path="res://scripts/Game.gd" id="1_gm"]
+[ext_resource type="PackedScene" uid="uid://bevcd1f6y0g1h" path="res://scenes/Player.tscn" id="2_pl"]
+[ext_resource type="Script" path="res://scripts/PlatformMinimap.gd" id="3_pm"]
+
+[sub_resource type="SystemFont" id="SystemFont_UI"]
+font_names = PackedStringArray("PingFang SC", "Noto Sans CJK SC", "Helvetica Neue", "Arial", "Noto Sans")
+font_weight = 450
+
+[sub_resource type="SystemFont" id="SystemFont_Broadcast"]
+font_names = PackedStringArray("DIN Alternate", "Arial Black", "Impact", "PingFang SC", "Noto Sans CJK SC", "Noto Sans")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_Formal"]
+font_names = PackedStringArray("Noto Serif SC", "Songti SC", "STSong", "Noto Serif CJK SC", "Noto Serif")
+font_weight = 500
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ControlNormal"]
+bg_color = Color(0.934, 0.912, 0.835, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.364706, 0.52549, 0.392157, 0.75)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ControlHover"]
+bg_color = Color(0.9, 0.955, 0.875, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.298039, 0.486275, 0.345098, 0.88)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ControlFocus"]
+bg_color = Color(0.915, 0.97, 0.888, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.266667, 0.439216, 0.317647, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Main" type="Node2D" unique_id=92779701]
+script = ExtResource("1_gm")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=323268848]
+position = Vector2(400, 340)
+
+[node name="Platforms" type="Node2D" parent="." unique_id=1095651345]
+
+[node name="Player" parent="." unique_id=49635891 instance=ExtResource("2_pl")]
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1843458354]
+
+[node name="ScoreLabel" type="Label" parent="HUD" unique_id=702270767]
+offset_left = 20.0
+offset_top = 14.0
+offset_right = 320.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(0.207843, 0.368627, 0.254902, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 28
+text = "Score: 0"
+
+[node name="StateLabel" type="Label" parent="HUD" unique_id=1238668640]
+offset_left = 20.0
+offset_top = 54.0
+offset_right = 980.0
+offset_bottom = 94.0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_Broadcast")
+theme_override_font_sizes/font_size = 22
+text = "Hold Space to Charge, Release to Jump"
+
+[node name="StartLabel" type="Label" parent="HUD" unique_id=91158166]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -320.0
+offset_top = 240.0
+offset_right = 320.0
+offset_bottom = 380.0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_Formal")
+theme_override_font_sizes/font_size = 46
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BrightnessLabel" type="Label" parent="HUD" unique_id=1000273751]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_top = 14.0
+offset_right = -20.0
+offset_bottom = 50.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 20
+text = "Brightness: 100% (-/+)"
+horizontal_alignment = 2
+
+[node name="VolumeLabel" type="Label" parent="HUD" unique_id=782174554]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_top = 56.0
+offset_right = -20.0
+offset_bottom = 90.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 20
+text = "Volume: 70% ([/])"
+horizontal_alignment = 2
+
+[node name="NetworkLabel" type="Label" parent="HUD" unique_id=1872002533]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -322.0
+offset_top = 100.0
+offset_right = -22.0
+offset_bottom = 134.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+text = "Net: Offline"
+horizontal_alignment = 2
+
+[node name="LanguageLabel" type="Label" parent="HUD" unique_id=1234074771]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -618.0
+offset_top = 14.0
+offset_right = -464.0
+offset_bottom = 46.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+text = "Language"
+horizontal_alignment = 2
+
+[node name="LanguageOption" type="OptionButton" parent="HUD" unique_id=373637210]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -448.0
+offset_top = 9.0
+offset_right = -250.0
+offset_bottom = 45.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_focus_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_pressed_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_hover_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_ControlNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ControlFocus")
+
+[node name="ModeLabel" type="Label" parent="HUD" unique_id=183709776]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -618.0
+offset_top = 57.0
+offset_right = -464.0
+offset_bottom = 89.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+text = "Mode"
+horizontal_alignment = 2
+
+[node name="ModeOption" type="OptionButton" parent="HUD" unique_id=973829760]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -448.0
+offset_top = 54.0
+offset_right = -250.0
+offset_bottom = 90.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_focus_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_pressed_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_hover_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_ControlNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ControlFocus")
+
+[node name="DurationLabel" type="Label" parent="HUD" unique_id=507152848]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -618.0
+offset_top = 99.0
+offset_right = -464.0
+offset_bottom = 131.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+text = "Race Time"
+horizontal_alignment = 2
+
+[node name="DurationOption" type="OptionButton" parent="HUD" unique_id=859944132]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -448.0
+offset_top = 98.0
+offset_right = -250.0
+offset_bottom = 134.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_focus_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_pressed_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_hover_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_ControlNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ControlFocus")
+
+[node name="ControlLabel" type="Label" parent="HUD" unique_id=129903410]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -618.0
+offset_top = 141.0
+offset_right = -464.0
+offset_bottom = 173.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+text = "Control"
+horizontal_alignment = 2
+
+[node name="ControlOption" type="OptionButton" parent="HUD" unique_id=204592711]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -448.0
+offset_top = 138.0
+offset_right = -250.0
+offset_bottom = 174.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_focus_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_pressed_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_hover_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_ControlNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ControlFocus")
+
+[node name="MIInputLabel" type="Label" parent="HUD" unique_id=819310575]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -618.0
+offset_top = 183.0
+offset_right = -464.0
+offset_bottom = 215.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+text = "MI Input"
+horizontal_alignment = 2
+
+[node name="MIInputOption" type="OptionButton" parent="HUD" unique_id=144226103]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -448.0
+offset_top = 180.0
+offset_right = -250.0
+offset_bottom = 216.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_focus_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_pressed_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_hover_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_fonts/font = SubResource("SystemFont_UI")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_ControlNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ControlHover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ControlFocus")
+
+[node name="PlayerNameEdit" type="LineEdit" parent="HUD" unique_id=1906074151]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -950.0
+offset_top = 12.0
+offset_right = -582.0
+offset_bottom = 52.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/font_placeholder_color = Color(0.247059, 0.407843, 0.286275, 0.65)
+theme_override_colors/caret_color = Color(0.247059, 0.407843, 0.286275, 1)
+theme_override_colors/selection_color = Color(0.552941, 0.764706, 0.588235, 0.45)
+theme_override_fonts/font = SubResource("SystemFont_Formal")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ControlNormal")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ControlFocus")
+text = "Player"
+placeholder_text = "Player name"
+max_length = 16
+
+[node name="PlatformMinimap" type="Control" parent="HUD" unique_id=1487762345]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 12.0
+offset_top = 108.0
+offset_right = 232.0
+offset_bottom = 328.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("3_pm")
+
+[node name="RecordsTitle" type="Label" parent="HUD" unique_id=471741591]
+offset_left = 24.0
+offset_top = 118.0
+offset_right = 570.0
+offset_bottom = 152.0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_Formal")
+theme_override_font_sizes/font_size = 20
+text = "Recent 10 Records"
+
+[node name="RecordsLabel" type="Label" parent="HUD" unique_id=1379012199]
+offset_left = 24.0
+offset_top = 156.0
+offset_right = 570.0
+offset_bottom = 322.0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_Formal")
+theme_override_font_sizes/font_size = 16
+text = "No records yet."
+autowrap_mode = 2
+
+[node name="PerfectCountLabel" type="Label" parent="HUD" unique_id=1865998312]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -220.0
+offset_top = 82.0
+offset_right = 220.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(0.25098, 0.447059, 0.305882, 1)
+theme_override_fonts/font = SubResource("SystemFont_Broadcast")
+theme_override_font_sizes/font_size = 24
+text = "Perfect: 0"
+horizontal_alignment = 1
+
+[node name="ComboLabel" type="Label" parent="HUD" unique_id=1636756365]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -220.0
+offset_top = 116.0
+offset_right = 220.0
+offset_bottom = 152.0
+theme_override_colors/font_color = Color(0.286275, 0.431373, 0.317647, 1)
+theme_override_fonts/font = SubResource("SystemFont_Broadcast")
+theme_override_font_sizes/font_size = 22
+text = "Combo x1"
+horizontal_alignment = 1
+
+[node name="RaceInfoLabel" type="Label" parent="HUD" unique_id=1701245621]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -260.0
+offset_top = 82.0
+offset_right = 260.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(0.25098, 0.447059, 0.305882, 1)
+theme_override_fonts/font = SubResource("SystemFont_Broadcast")
+theme_override_font_sizes/font_size = 24
+text = "Time 60.0s | Dist 0"
+horizontal_alignment = 1
