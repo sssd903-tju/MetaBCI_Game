@@ -1,0 +1,79 @@
+{
+  "mode": "ssvep",
+  "layout": "mole",
+  "freqs": "8.0, 15.0",
+  "trials": [
+    {
+      "trial": 1,
+      "target_index": 1,
+      "freq": 15.0,
+      "label": "15.0 Hz",
+      "actual_fps": 120.0
+    },
+    {
+      "trial": 2,
+      "target_index": 0,
+      "freq": 8.0,
+      "label": "8.0 Hz",
+      "actual_fps": 119.8
+    },
+    {
+      "trial": 3,
+      "target_index": 1,
+      "freq": 15.0,
+      "label": "15.0 Hz",
+      "actual_fps": 120.1
+    },
+    {
+      "trial": 4,
+      "target_index": 0,
+      "freq": 8.0,
+      "label": "8.0 Hz",
+      "actual_fps": 119.8
+    },
+    {
+      "trial": 5,
+      "target_index": 0,
+      "freq": 8.0,
+      "label": "8.0 Hz",
+      "actual_fps": 119.8
+    },
+    {
+      "trial": 6,
+      "target_index": 1,
+      "freq": 15.0,
+      "label": "15.0 Hz",
+      "actual_fps": 120.0
+    },
+    {
+      "trial": 7,
+      "target_index": 1,
+      "freq": 15.0,
+      "label": "15.0 Hz",
+      "actual_fps": 120.0
+    },
+    {
+      "trial": 8,
+      "target_index": 0,
+      "freq": 8.0,
+      "label": "8.0 Hz",
+      "actual_fps": 120.0
+    },
+    {
+      "trial": 9,
+      "target_index": 0,
+      "freq": 8.0,
+      "label": "8.0 Hz",
+      "actual_fps": 119.9
+    },
+    {
+      "trial": 10,
+      "target_index": 1,
+      "freq": 15.0,
+      "label": "15.0 Hz",
+      "actual_fps": 120.0
+    }
+  ],
+  "total_trials": 10,
+  "accuracy": "准确率 60% (6/10) |"
+}

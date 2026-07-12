@@ -1,0 +1,19 @@
+{
+  "srate": 250.0,
+  "n_channels": 8,
+  "duration": 43.584,
+  "samples": 10896,
+  "date": "20260705_224212",
+  "paradigm": "ssvep",
+  "channel_names": [
+    "CH2",
+    "CH1",
+    "ECG",
+    "Ch3",
+    "Ch4",
+    "Ch5",
+    "Ch6",
+    "Ch7"
+  ],
+  "preproc": true
+}
