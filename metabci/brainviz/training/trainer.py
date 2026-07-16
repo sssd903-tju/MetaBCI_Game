@@ -78,7 +78,6 @@ except Exception:
 
 def _check_deps():
     """检查 PsychoPy 和 brainstim 依赖"""
-    # Monkey-patch 修复 linebreak_class 字节码溢出
     _patch_linebreak()
 
     try:
@@ -86,6 +85,12 @@ def _check_deps():
     except ImportError:
         _emit({"status": "error", "message": "PsychoPy 未安装。请运行: pip install psychopy"})
         sys.exit(1)
+
+    if BRAINSTIM_AVAILABLE:
+        logger.info("brainstim 范式类已加载: SSVEP=%s P300=%s MI=%s",
+                     _BrainStimSSVEP, _BrainStimP300, _BrainStimMI)
+    else:
+        logger.warning("brainstim 范式类未加载 (PsychoPy 兼容性问题)，使用内置训练逻辑")
 
     # 将 MetaBCI 加入路径
     metabci_path = os.path.abspath(

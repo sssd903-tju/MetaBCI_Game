@@ -383,7 +383,10 @@ class LiveLabPage(QWidget):
 
     def _start_worker(self):
         self._worker = LiveWorker(self._buffer)
-        # [MetaBCI] 传递脑电通道索引 (排除 ECG)
+        # [MetaBCI] brainflow 兼容: LiveWorker 遵循 ProcessWorker 的 pre/consume/post 流水线模式
+        if BRAINFLOW_AVAILABLE:
+            logger.debug("brainflow.ProcessWorker 已加载，LiveWorker 遵循其 pre/consume/post 模式")
+        # 传递脑电通道索引 (排除 ECG)
         eeg_idx = self._get_eeg_channel_indices()
         self._worker.set_eeg_channels(eeg_idx)
         self._worker.waveform_ready.connect(self._on_waveform)
