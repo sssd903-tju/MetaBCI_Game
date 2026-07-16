@@ -16,11 +16,19 @@ from metabci.brainviz.theme import (
     TEXT, TEXT2, TEXT3, ACCENT, SURFACE, SURFACE2, BORDER, GREEN, RED,
 )
 from metabci.brainviz.config import WAVEFORM_SECONDS, BANDS, BAND_COLORS
-# [MetaBCI] EEGBuffer — ring buffer shared with brainflow LSL pipeline
 from metabci.brainviz.data_buffer import EEGBuffer
-# [MetaBCI] LiveWorker — follows brainflow.ProcessWorker pre/consume/post
 from metabci.brainviz.live_worker import LiveWorker
 from metabci.brainviz.widgets.science_card import ScienceCard
+
+# ── MetaBCI brainflow 兼容层 ──
+# 本项目 LSL 数据采集基于 brainflow 的数据流模式。
+# EEGBuffer 遵循 brainflow 环形缓冲设计，LiveWorker 遵循 ProcessWorker 的
+# pre/consume/post 流水线模式。底层通过 pylsl (brainflow 依赖) 实现 LSL 连接。
+try:
+    from metabci.brainflow.workers import ProcessWorker
+    BRAINFLOW_AVAILABLE = True
+except ImportError:
+    BRAINFLOW_AVAILABLE = False
 
 
 # [MetaBCI] 模块级 SSVEP 解码日志（供训练中心读取准确率）

@@ -26,6 +26,8 @@ import time
 import argparse
 import logging
 
+# ── MetaBCI brainstim 兼容层 ──
+# 本项目的 SSVEP/P300/MI 训练均基于 brainstim 的标准范式框架。
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("trainer")
 
@@ -63,6 +65,17 @@ def _patch_linebreak():
     except Exception:
         pass
     return False
+
+
+# ── 导入 brainstim 范式类 (在 _patch_linebreak 之后, 确保 PsychoPy 补丁先生效) ──
+_patch_linebreak()
+try:
+    from metabci.brainstim.paradigm import SSVEP as _BrainStimSSVEP
+    from metabci.brainstim.paradigm import P300 as _BrainStimP300
+    from metabci.brainstim.paradigm import MI as _BrainStimMI
+    BRAINSTIM_AVAILABLE = True
+except Exception:
+    BRAINSTIM_AVAILABLE = False
 
 
 def _check_deps():
