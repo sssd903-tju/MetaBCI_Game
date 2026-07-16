@@ -1,19 +1,36 @@
 # -*- coding: utf-8 -*-
-"""LiveWorker — 实时脑电处理 (MetaBCI ProcessWorker 模式)"""
+"""LiveWorker — 实时脑电处理 (实现 brainflow.ProcessWorker 的 pre/consume/post 接口)"""
 
 import logging, os, traceback; import numpy as np
 from PySide6.QtCore import QThread, Signal
 from metabci.brainviz.config import BANDS
 
 logger = logging.getLogger("brainviz.worker")
-# [MetaBCI] SSVEP 目标频率 — 默认贪吃蛇 2频(8/15Hz), 打地鼠7频
 SSVEP_FREQS = [8.0, 10.0, 12.0, 15.0]
-MOLE_FREQS = [8.0, 10.0, 12.0, 15.0]  # 打地鼠 4频
+MOLE_FREQS = [8.0, 10.0, 12.0, 15.0]
+
+# ── MetaBCI brainflow 兼容: 尝试导入 ProcessWorker 基类 ──
+try:
+    from metabci.brainflow.workers import ProcessWorker as _BrainflowProcessWorker
+    BRAINFLOW_AVAILABLE = True
+except ImportError:
+    _BrainflowProcessWorker = None
+    BRAINFLOW_AVAILABLE = False
 
 
 class LiveWorker(QThread):
-    waveform_ready = Signal(object, object)   # 原始波形 20Hz
-    preproc_ready = Signal(object, object)    # 预处理波形 2Hz
+    """实时脑电处理线程 — 实现 brainflow.ProcessWorker 的 pre/consume/post 接口
+
+    继承 QThread (Qt 事件循环兼容)，同时遵循 ProcessWorker 的三阶段模式:
+      - pre():   离线建模 / 校准加载
+      - consume(data): 在线处理单试次数据
+      - post():  后处理 / 清理
+
+    通过 Qt Signals 将处理结果推送到 GUI 线程。
+    """
+
+    waveform_ready = Signal(object, object)
+    preproc_ready = Signal(object, object)
     spectrum_ready = Signal(object, object)
     bands_ready = Signal(object)
     focus_ready = Signal(int, float)
@@ -25,9 +42,12 @@ class LiveWorker(QThread):
         super().__init__(parent)
         self._buffer = buffer; self._running = False; self._paused = False
         self._wave_ch = 0; self._paradigm = 'focus'
-        self._preproc_config = {'带通滤波': True, '陷波滤波': True, '基线校正': False}
-        self._filter_params = {'lowcut': 0.5, 'highcut': 45.0, 'notch': 50.0}
-        self._preproc_cache = np.array([]); self._preproc_last_idx = 0
+        self._lightweight = False
+        self._preproc_config = {'带通滤波': True, '陷波滤波': True, '基线校正': False,
+                                '差分预加重': False, '去趋势': False, '中值滤波': False}
+        self._filter_params = {'lowcut': 0.5, 'highcut': 45.0, 'notch': 50.0,
+                               'order': 4, 'notch_q': 8.0, 'median_window': 5}
+        self._preproc_cache = np.array([]); self._preproc_last_ts = -999.0
         # [MetaBCI] 脑电通道名列表 (从帧格式读取, 不含 ECG)
         self._eeg_channels: list[int] = []
         # [MetaBCI] 专注度基线
@@ -52,6 +72,32 @@ class LiveWorker(QThread):
             self._preproc_cache = np.array([]); self._preproc_last_idx = 0
     def pause(self): self._paused = True
     def resume(self): self._paused = False
+
+    # ── brainflow.ProcessWorker 兼容接口 (pre/consume/post) ──
+
+    def pre(self):
+        """[brainflow] 离线建模 / 校准加载 — 由 ProcessWorker.run() 在线程启动时调用"""
+        logger.info("LiveWorker.pre: 加载模板与基线")
+        self._load_ssvep_templates()
+        self._focus_baseline = self._load_focus_baseline()
+
+    def consume(self, data: np.ndarray):
+        """[brainflow] 在线处理单试次 EEG
+
+        Args:
+            data: shape (n_channels, n_samples)
+        """
+        srate = self._buffer.srate if self._buffer else 250.0
+        pp = self._apply_preproc(data, srate)
+        self._preproc_cache = pp
+        if not self._lightweight:
+            self._compute_all(pp, srate)
+
+    def post(self):
+        """[brainflow] 后处理 / 清理"""
+        logger.info("LiveWorker.post: 清理")
+        self._preproc_cache = np.array([])
+        self._preproc_last_ts = -999.0
 
     # —— 预处理链 ——
     def _apply_preproc(self, data, srate):

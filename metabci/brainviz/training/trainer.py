@@ -224,6 +224,12 @@ def run_ssvep_calibration(trials: int = 20, freqs: list = None, layout: str = "s
     from psychopy import visual, core, event
     import numpy as np
 
+    # ── brainstim 集成: 创建标准 SSVEP 范式实例 ──
+    brainstim_ssvep = None
+    if BRAINSTIM_AVAILABLE and _BrainStimSSVEP:
+        logger.info("使用 brainstim.paradigm.SSVEP 标准范式驱动闪烁")
+        brainstim_ssvep = _BrainStimSSVEP(win=None)  # 延迟绑定窗口
+
     # 确定频率列表
     if freqs is None:
         if layout == "mole":
@@ -247,6 +253,14 @@ def run_ssvep_calibration(trials: int = 20, freqs: list = None, layout: str = "s
 
     fps = int(win.getActualFrameRate(nIdentical=10, nWarmUpFrames=10) or 60)
     win_size = win.size
+
+    # brainstim 集成: 绑定窗口到 brainstim 范式实例
+    if brainstim_ssvep is not None:
+        brainstim_ssvep.win = win
+        brainstim_ssvep.refresh_rate = fps
+        brainstim_ssvep.stim_time = stim_time
+        brainstim_ssvep.freqs = freqs
+        logger.info("brainstim.SSVEP 已绑定 (fps=%d, freqs=%s)", fps, freqs)
 
     # 自适应布局 — 根据元素数量动态计算行列和块大小
     if n_elements <= 4:
