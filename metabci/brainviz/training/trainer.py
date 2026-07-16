@@ -26,8 +26,6 @@ import time
 import argparse
 import logging
 
-# ── MetaBCI brainstim 兼容层 ──
-# 本项目的 SSVEP/P300/MI 训练均基于 brainstim 的标准范式框架。
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("trainer")
 
