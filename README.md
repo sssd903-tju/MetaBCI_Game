@@ -22,6 +22,36 @@
 脑电设备 → LSL/串口 → EEGBuffer → LiveWorker(预处理+解码) → GameBridge(WebSocket) → Godot游戏
 ```
 
+## 范式调用
+
+本项目通过以下链条完整调用 MetaBCI brainstim 的标准范式：
+
+```
+GUI 训练中心 (training_center.py)
+  → 子进程启动 trainer.py
+    → brainstim.paradigm.SSVEP / P300 / MI   ← 标准范式类
+    → PsychoPy Window + 实时钟驱动闪烁/oddball/运动想象
+    → LSL 标记输出 (与 brainflow 数据采集同步)
+    → 试次标签 + 频率模板 + 准确率报告
+```
+
+**brainstim 集成**：`trainer.py` 的 `run_ssvep_calibration()` 在运行时会创建 `brainstim.paradigm.SSVEP` 实例，将 PsychoPy 窗口绑定到该实例，并设置 `refresh_rate`、`stim_time`、`freqs` 等标准属性。有 PsychoPy 环境时使用 brainstim 标准范式驱动闪烁；无 PsychoPy 时优雅降级。
+
+**brainflow 集成**：`LiveWorker` 实现 `pre()` / `consume(data)` / `post()` 三阶段接口，遵循 `brainflow.workers.ProcessWorker` 标准模式。`brainflow_worker.py` 提供 `BrainflowWorker` 类，直接继承 `ProcessWorker`，可在无 GUI 子进程中运行完整处理管线。
+
+**命令行直接启动范式刺激**（需 conda 环境 `metabci-brainstim`）：
+
+```bash
+# SSVEP 4 频率闪烁 (↑8 →10 ↓12 ←15 Hz)
+python metabci/brainviz/training/trainer.py --mode ssvep --trials 20 --freqs 8,10,12,15
+
+# P300 3×2 行列闪烁 oddball
+python metabci/brainviz/training/trainer.py --mode p300 --trials 12
+
+# MI 运动想象 (cue→想象→反馈→休息)
+python metabci/brainviz/training/trainer.py --mode mi --trials 20
+```
+
 ## 测试示例程序
 
 ### SSVEP
